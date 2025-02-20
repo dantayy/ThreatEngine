@@ -5,7 +5,7 @@ using TMPro;
 // class holding stats for a card in our threat engine game
 // should be attached to the Card prefab and set its visual attributes based on the associated fields in this script
 // includes a pure virtual function to be implemented by children that will be called by the game manager to determine score changes for players that pick the card
-public class Card : MonoBehaviour
+public class CardScript : MonoBehaviour
 {
     // ID of card, used to bind the prefab to a particular backend 
     [Header("ID")]
@@ -23,7 +23,7 @@ public class Card : MonoBehaviour
     [field: SerializeField] private Sprite CardImageSprite;
     // name of card (hand it belongs to? just a letter like in the docs?)
     [field: SerializeField] private TextMeshProUGUI CardTitle; // set with prefab child element of same name in editor
-    [field: SerializeField, TextArea] private string CardTitleText;
+    [field: SerializeField] private string CardTitleText;
     // description of what selecting this card will do for all players that pick it
     [field: SerializeField] private TextMeshProUGUI CardEffect; // set with prefab child element of same name in editor
     [field: SerializeField, TextArea] private string CardEffectText;
@@ -36,7 +36,7 @@ public class Card : MonoBehaviour
     */
     [Header("Player Effects")]
     // EXACT number of players that must select this card for the points to become the bonus value
-    [field: SerializeField] public int SelectionTarget = 0;
+    [field: SerializeField] public int SelectionTarget { get; private set; } = 0;
     // number of players that can select this card before the points become the default value
     [field: SerializeField] public int SelectionMax { get; private set; } = 0;
     // number of players that must select this card before the points become the bonus value
@@ -71,7 +71,7 @@ public class Card : MonoBehaviour
     */
     [Header("Threat Effects")]
     // EXACT number of players that must select this card for the threat points to become the bonus value
-    [field: SerializeField] public int ThreatSelectionTarget = 0;
+    [field: SerializeField] public int ThreatSelectionTarget { get; private set; } = 0;
     // number of players that can select this card before the threat points become the default value
     [field: SerializeField] public int ThreatSelectionMax { get; private set; } = 0;
     // number of players that need to select this card before the threat points become the bonus value
