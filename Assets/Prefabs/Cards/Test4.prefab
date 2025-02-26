@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &5441303418688002564
+--- !u!1001 &4869558240470865834
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,47 +10,47 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: CardTitleText
-      value: Test Title 2
+      value: Test4
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: CardEffectText
-      value: +2
+      value: +4
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: ThreatEffectText
-      value: +2
+      value: +4
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: <CardID>k__BackingField
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: <PointsDefault>k__BackingField
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: <PointsSpecial>k__BackingField
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: <ThreatPointsDefault>k__BackingField
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: <ThreatPointsSpecial>k__BackingField
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4781950512510181130, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_text
-      value: +2
+      value: +4
       objectReference: {fileID: 0}
     - target: {fileID: 4845470601647696379, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_text
-      value: Test Title 2
+      value: Test4
       objectReference: {fileID: 0}
     - target: {fileID: 5673173231775475616, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_text
-      value: +2
+      value: +4
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Pivot.x
@@ -114,11 +114,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 982
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 357
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -134,7 +134,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Name
-      value: Test2
+      value: Test4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

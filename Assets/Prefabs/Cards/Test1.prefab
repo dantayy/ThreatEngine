@@ -78,11 +78,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 700
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -114,11 +114,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 491
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 357
       objectReference: {fileID: 0}
     - target: {fileID: 7777327033250758360, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -134,7 +134,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Name
-      value: CardPrefab Variant
+      value: Test1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

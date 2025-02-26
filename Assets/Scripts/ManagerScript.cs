@@ -1,32 +1,52 @@
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public class ManagerScript : MonoBehaviour
 {
 
-    [Header("Cards")]
+    // UI elements
+    [SerializeField] public Canvas GameCanvas;
+    [SerializeField] public Button StartButton;
+    [SerializeField] public TextMeshProUGUI TimerText;
+    [SerializeField] public float playerTurnTime;
+    [SerializeField] public float timeBetweenRounds;
+    private bool timerRunning = false;
+
     // hands that can be played in the game
-    [field: SerializeField] public List<HandScript> Hands;
+    [SerializeField] public List<HandScript> Hands;
+    [SerializeField] GameObject cardPrefab;
 
     // hand currently being played
     HandScript currentHand;
 
+    // dynamic position to place cards with
+    Vector2 cardPos = new Vector2();
+    // dynamic spacing between cards
+    int cardSpacing = 0;
+
     // players to be managed
-    [Header("Players")]
-    [field: SerializeField] public PlayerScript Player1;
-    [field: SerializeField] public PlayerScript Player2;
-    [field: SerializeField] public PlayerScript Player3;
-    [field: SerializeField] public PlayerScript Player4;
+    [SerializeField] public List<PlayerScript> Players;
 
     // player currently taking their turn
-    PlayerScript CurrentPlayer;
+    PlayerScript CurrentPlayer = null;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // put start button on screen(?)
+        // hide the timer initially
+        TimerText.enabled = false;
+
+        // make the play button initiate the main game state
+        StartButton.onClick.AddListener(InitiatePlayLoop);
+
+        // initialize the card position var
+        cardPos.Set(0, GameCanvas.pixelRect.height / 2);
     }
 
     // Update is called once per frame
@@ -42,8 +62,13 @@ public class ManagerScript : MonoBehaviour
     // set up the main play screen and draw the first hand of cards for players to pick from
     void InitiatePlayLoop()
     {
-        // set current player
-        CurrentPlayer = Player1;
+        // hide start button
+        StartButton.enabled = false;
+
+        // show the selection timer text
+        TimerText.text = "Starting...";
+        TimerText.enabled = true;
+
         // no hands to pull from, abort
         if(Hands.Count == 0)
         {
@@ -60,12 +85,20 @@ public class ManagerScript : MonoBehaviour
     void DrawHand()
     {
         // select a random hand from the list
-        currentHand = Hands[Random.Range(0, Hands.Count - 1)];
+        currentHand = Hands[Random.Range(0, Hands.Count)];
 
+        cardSpacing = (int)(GameCanvas.pixelRect.width) / (currentHand.cards.Count + 1);
+
+        cardPos.x = cardSpacing;
+
+        GameObject cardRef;
         // take each card from the selected hand and put them on the screen
         foreach(CardScript card in currentHand.cards)
         {
-            //card.GetComponent<Transform>().
+            cardRef = Instantiate(card.gameObject);
+            cardRef.transform.SetParent(GameCanvas.gameObject.transform);
+            cardRef.transform.SetPositionAndRotation(cardPos, Quaternion.identity);
+            cardPos.x += cardSpacing;
         }
     }
 

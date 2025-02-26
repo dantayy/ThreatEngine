@@ -113,7 +113,7 @@ public class CardScript : MonoBehaviour
         CardImage.sprite = CardImageSprite;
         CardTitle.text = CardTitleText;
         CardEffect.text = CardEffectText;
-        ThreatEffect.text = ThreatEffectText;    
+        ThreatEffect.text = ThreatEffectText;
     }
 
     private void OnValidate()
