@@ -45,14 +45,14 @@ public class CardScript : MonoBehaviour
     [field: SerializeField] public int PointsDefault { get; private set; } = 0;
     // number of points a player will get from this card when a special condition HAS been met
     [field: SerializeField] public int PointsSpecial { get; private set; } = 0;
-    // damage dealt to threat by this card when a special condition has NOT been met
-    [field: SerializeField] public int DamageDefault { get; private set; } = 0;
-    // damage dealt to threat by this card when a special condition HAS been met
-    [field: SerializeField] public int DamageSpecial { get; private set; } = 0;
-    // health healed to threat by this card when a special condition has NOT been met
-    [field: SerializeField] public int HealDefault { get; private set; } = 0;
-    // health healed to threat by this card when a special condition HAS been met
-    [field: SerializeField] public int HealSpecial { get; private set; } = 0;
+    // // damage dealt to threat by this card when a special condition has NOT been met
+    // [field: SerializeField] public int DamageDefault { get; private set; } = 0;
+    // // damage dealt to threat by this card when a special condition HAS been met
+    // [field: SerializeField] public int DamageSpecial { get; private set; } = 0;
+    // // health healed to threat by this card when a special condition has NOT been met
+    // [field: SerializeField] public int HealDefault { get; private set; } = 0;
+    // // health healed to threat by this card when a special condition HAS been met
+    // [field: SerializeField] public int HealSpecial { get; private set; } = 0;
     // number of points a non-threat player will "gift" to the threat when a special condition has NOT been met
     [field: SerializeField] public int GiftDefault { get; private set; } = 0;
     // number of points a non-threat player will "gift" to the threat when a special condition HAS been met
