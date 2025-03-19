@@ -391,6 +391,28 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &406503445 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6963767608897642333, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+  m_PrefabInstance: {fileID: 1625741904}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44fdf3f309f6e6e4e8d479921d46cc84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &436334313 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6963767608897642333, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+  m_PrefabInstance: {fileID: 1054637743}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44fdf3f309f6e6e4e8d479921d46cc84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -785,6 +807,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+--- !u!114 &599531404 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6963767608897642333, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+  m_PrefabInstance: {fileID: 2108249926}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44fdf3f309f6e6e4e8d479921d46cc84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -1351,6 +1384,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1128244206}
   m_CullTransparentMesh: 1
+--- !u!114 &1138352781 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6963767608897642333, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+  m_PrefabInstance: {fileID: 592988985}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44fdf3f309f6e6e4e8d479921d46cc84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1453198771
 GameObject:
   m_ObjectHideFlags: 0
@@ -1526,7 +1570,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 086e86168b345424f9f7890f0be806e4, type: 2}
   - {fileID: 11400000, guid: 951f27e42ae49bc44a6a040708747956, type: 2}
   cardPrefab: {fileID: 0}
-  Players: []
+  Players:
+  - {fileID: 406503445}
+  - {fileID: 599531404}
+  - {fileID: 436334313}
+  - {fileID: 1138352781}
 --- !u!4 &1540712661
 Transform:
   m_ObjectHideFlags: 0
@@ -1593,10 +1641,6 @@ PrefabInstance:
     - target: {fileID: 6075995503507366044, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
-      propertyPath: m_NotificationBehavior
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_ActionEvents.Array.data[9].m_PersistentCalls.m_Calls.Array.data[0].m_Mode

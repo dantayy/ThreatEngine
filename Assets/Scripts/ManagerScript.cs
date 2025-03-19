@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -184,18 +185,16 @@ public class ManagerScript : MonoBehaviour
                 // unset the flag
                 playerTurnFlag = false;
             }
-            else
-            {
-                // reset timer
-                timeRemaining = playerTurnTime;
-                // reset timer text (should already be activated from the discussion)
-                TimerText.text = Mathf.CeilToInt(timeRemaining).ToString();
-            }
         }
-        // update UI to indicate which player is making their choice currently
+        // a player is going to make their selection now
         if(playerTurnFlag)
         {
+            // update UI
             GuideText.text = "Player " + (CurrentPlayerIdx + 1) + " make your decision now!";
+            // reset timer
+            timeRemaining = playerTurnTime;
+            // reset timer text (should already be activated from the discussion)
+            TimerText.text = Mathf.CeilToInt(timeRemaining).ToString();            
         }
         // resolve the turn with all choices made
         else
@@ -209,11 +208,198 @@ public class ManagerScript : MonoBehaviour
     public void PlayerInputCallback(InputAction.CallbackContext context)
     {
         Debug.Log("Pressed one of the buttons I care about!");
+
+        if(CurrentPlayerIdx < 0)
+        {
+            Debug.Log("No player currently in control to make a choice!");
+            return;
+        }
+        // lock in choices for whatever player is currently in play
+        switch (context.action.name)
+        {
+            case "OptionA":
+                Players[CurrentPlayerIdx].playerChoice = 0;
+                break;
+            case "OptionB":
+                Players[CurrentPlayerIdx].playerChoice = 1;
+                break;
+            case "OptionC":
+                Players[CurrentPlayerIdx].playerChoice = 2;
+                break;
+            case "OptionD":
+                Players[CurrentPlayerIdx].playerChoice = 3;
+                break;
+            case "OptionE":
+                Players[CurrentPlayerIdx].playerChoice = 4;
+                break;
+            case "ThreatAction":
+                Players[CurrentPlayerIdx].threatAction = true;
+                break;
+            case "ChoosePlayer1":
+                Players[CurrentPlayerIdx].playerTargets.Add(1);
+                break;
+            case "ChoosePlayer2":
+                Players[CurrentPlayerIdx].playerTargets.Add(2);
+                break;
+            case "ChoosePlayer3":
+                Players[CurrentPlayerIdx].playerTargets.Add(3);
+                break;
+            case "ChoosePlayer4":
+                Players[CurrentPlayerIdx].playerTargets.Add(4);
+                break;
+            default:
+                break;
+        }
     }
 
     // work to take players choices and resolve them here, updating threat status/health and point totals and bringing the game to its end state if necesary
     void ResolveTurn()
     {
+        // check who took the threat action
+        PlayerScript threatPlayer = null;
+        List<PlayerScript> threatActionPlayers = new List<PlayerScript>();
+        foreach(PlayerScript player in Players)
+        {
+            if(player.threat)
+            {
+                threatPlayer = player;
+            }
 
+            if(player.threatAction)
+            {
+                threatActionPlayers.Add(player);
+            }
+        }
+
+        // resolve changes in threat status
+        if(threatActionPlayers.Count > 0)
+        {
+            // someone is gaining threat status or failing their defense
+            if(threatActionPlayers.Count() == 1)
+            {
+                // failed defense, remove threat status
+                if(threatPlayer)
+                {
+                    threatPlayer.threat = false;
+                }
+                // successful threat activation, provide bonus and set flag
+                else
+                {
+                    threatPlayer = threatActionPlayers[0];
+                    threatPlayer.threat = true;
+                    threatPlayer.score += 5;
+                }
+            }
+            // players are fighting the threat
+            else if(threatPlayer)
+            {
+                // threat defended themselves
+                if(threatPlayer.threatAction)
+                {
+                    // threat succesfully defends themselves against multiple attackers
+                    if(threatActionPlayers.Count() > 2)
+                    {
+                        // deduct points from the dunces
+                        foreach(PlayerScript player in threatActionPlayers)
+                        {
+                            if(!player.threat)
+                            {
+                                player.score -= 2;
+                            }
+                        }
+                    }
+                    // defense was subverted by a single sneaky attacker, passing threat status to them
+                    else
+                    {
+                        foreach(PlayerScript player in threatActionPlayers)
+                        {
+                            if(player.threat)
+                            {
+                                player.threat = false;
+                                player.score -= 5;
+                            }
+                            else
+                            {
+                                player.threat = true;
+                                player.score += 5;
+                            }
+                        }
+                    }
+                }
+                // threat did not defend themselves, they lose threat status and points
+                else
+                {
+                    threatPlayer.threat = false;
+                    threatPlayer.score -= 5;
+                }
+            }
+            // multiple people unsuccessfully tried to become the threat at once
+            else
+            {
+                // deduct points from the dunces
+                foreach(PlayerScript player in threatActionPlayers)
+                {
+                    player.score -= 2;
+                }
+            }
+
+            // reset the threat action flag for everyone that took it
+            foreach(PlayerScript player in threatActionPlayers)
+            {
+                player.threatAction = false;
+            }
+        }
+
+        // resolve card choice effects
+        int playerResolutionIdx = FirstPlayerIdx;
+        PlayerScript playerToAffect = null;        
+        do
+        {
+            playerToAffect = Players[playerResolutionIdx];
+            // verify they chose a valid card option
+            // TODO: prevent this bad choice from being possible in the first place!
+            if(playerToAffect.playerChoice >= currentHand.cards.Count())
+            {
+                Debug.Log("Player " + (playerResolutionIdx + 1) + " chose a non-existant card! Are they stupid?");
+            }
+            else
+            {
+                // refer to the TABLE OF CARD EFFECTS to resolve players card choices
+                // EffectManager.ResolveEffect(playerToAffect, currentHand.cards[playerToAffect.playerChoice]);
+            }
+
+            // update the player resolution index
+            playerResolutionIdx++;
+            if(playerResolutionIdx == Players.Count())
+            {
+                playerResolutionIdx = 0;
+            }
+        } while (playerResolutionIdx != FirstPlayerIdx);
+
+        // determine if a winner exists
+        int winningScore = 20;
+        PlayerScript winningPlayer = null;
+        foreach(PlayerScript player in Players)
+        {
+            if(player.score >= winningScore)
+            {
+                winningScore = player.score;
+                if(!winningPlayer || winningPlayer.score < winningScore || (winningPlayer.score == player.score && player.threat))
+                {
+                    winningPlayer = player;
+                }
+            }
+        }
+
+        // TODO: destroy existing hand's instantiated cards to make way for the next hand
+
+        if(winningPlayer)
+        {
+            Debug.Log("Player has won the game!");
+        }
+        else
+        {
+            DrawHand();
+        }
     }
 }

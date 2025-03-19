@@ -80,14 +80,14 @@ public class CardScript : MonoBehaviour
     [field: SerializeField] public int ThreatPointsDefault { get; private set; } = 0;
     // number of EXTRA points a threat will get from this card when a special condition HAS been met
     [field: SerializeField] public int ThreatPointsSpecial { get; private set; } = 0;
-    // EXTRA damage dealt to threat by themselves with this card when a special condition has NOT been met
-    [field: SerializeField] public int ThreatDamageDefault { get; private set; } = 0;
-    // EXTRA damage dealt to threat by themselves with this card when a special condition HAS been met
-    [field: SerializeField] public int ThreatDamageSpecial { get; private set; } = 0;
-    // EXTRA health healed to threat by themselves with this card when a special condition has NOT been met
-    [field: SerializeField] public int ThreatHealDefault { get; private set; } = 0;
-    // EXTRA health healed to threat by themselves with this card when a special condition HAS been met
-    [field: SerializeField] public int ThreatHealSpecial { get; private set; } = 0;
+    // // EXTRA damage dealt to threat by themselves with this card when a special condition has NOT been met
+    // [field: SerializeField] public int ThreatDamageDefault { get; private set; } = 0;
+    // // EXTRA damage dealt to threat by themselves with this card when a special condition HAS been met
+    // [field: SerializeField] public int ThreatDamageSpecial { get; private set; } = 0;
+    // // EXTRA health healed to threat by themselves with this card when a special condition has NOT been met
+    // [field: SerializeField] public int ThreatHealDefault { get; private set; } = 0;
+    // // EXTRA health healed to threat by themselves with this card when a special condition HAS been met
+    // [field: SerializeField] public int ThreatHealSpecial { get; private set; } = 0;
     // EXTRA points a threat will take away from one or more other players when a special condition has NOT been met
     [field: SerializeField] public int ThreatTaxDefault { get; private set; } = 0;
     // EXTRA points a threat will take away from one or more other players when a special condition HAS been met
@@ -96,16 +96,6 @@ public class CardScript : MonoBehaviour
     [field: SerializeField] public int ThreatTargetDefault { get; private set; } = 0;
     // number of other players that will be targeted by this card's threat effect when a special condition HAS been met
     [field: SerializeField] public int ThreatTargetSpecial { get; private set; } = 0;
-
-    // manager will take players decisions in turn order
-    // look at player set to be going first in the round
-    // look at their points
-    // look at their card choice
-    // look at other players points
-    // look at other players card choices
-    // resolve card-specific conditionals, plugging in player points/choices when needed
-    // how do we write code to manage a potentially expanding pool of cards with variable conditionals in an easily main?
-    // map of scripts? key = hand name, value = set of lambdas, one for each card in the hand that runs the score/health work
 
     private void Awake()
     {

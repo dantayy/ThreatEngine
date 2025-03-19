@@ -1,27 +1,13 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-
-    public enum choices {
-        noChoice,
-        choice1,
-        choice2,
-        choice3,
-        choice4,
-        choice5,
-        choice6,
-        choice7,
-        choice8,
-        choice9,
-        choiceThreat
-    }
-
     public int score = 0;
+    public bool threatAction = false;
     public bool threat = false;
-    public choices playerChoice = choices.noChoice;
-
-
+    public int playerChoice = -1;
+    public List<int> playerTargets;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
