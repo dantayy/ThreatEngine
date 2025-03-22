@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: <CardID>k__BackingField
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3430473814189888969, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: <PointsDefault>k__BackingField

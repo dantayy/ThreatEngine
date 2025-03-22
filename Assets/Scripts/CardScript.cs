@@ -7,9 +7,19 @@ using TMPro;
 // includes a pure virtual function to be implemented by children that will be called by the game manager to determine score changes for players that pick the card
 public class CardScript : MonoBehaviour
 {
+
+    public enum CardIDs
+    {
+        // TODO: for each hand, make enum values for each card effect that will tie to a corresponding code block in a massive switch system in the manager
+        NoID,
+        TestHandA,
+        TestHandB,
+        TestHandC
+    }
+
     // ID of card, used to bind the prefab to a particular backend 
     [Header("ID")]
-    [field: SerializeField] public int CardID { get; private set; } = 0;
+    [field: SerializeField] public CardIDs CardID { get; private set; } = CardIDs.NoID;
 
     /**
     General Properties used for card text editing

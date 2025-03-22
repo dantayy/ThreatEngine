@@ -18,6 +18,9 @@ public class ManagerScript : MonoBehaviour
     [SerializeField] public Button StartButton;
     [SerializeField] public TextMeshProUGUI GuideText;
     [SerializeField] public TextMeshProUGUI TimerText;
+    // NOTE: put these gameobjects in this list in the same order as the playerscripts they are representing!
+    [SerializeField] public List<TextMeshProUGUI> PlayerScores;
+
 
     // timer-related fields
     [SerializeField] public float playerTurnTime; // time to choose an option for a player
@@ -67,11 +70,6 @@ public class ManagerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // wait for start to be clicked
-        // IF game started
-        // hide start button
-        // display player scores, threat status, and a marker for player going first
-        // pick a random hand of card prefabs to load. Size and position them based on number of cards in the hand
         if(discussionFlag && timeRemaining <= 0)
         {
             // flip discussion/player turn flags
@@ -365,7 +363,8 @@ public class ManagerScript : MonoBehaviour
             else
             {
                 // refer to the TABLE OF CARD EFFECTS to resolve players card choices
-                // EffectManager.ResolveEffect(playerToAffect, currentHand.cards[playerToAffect.playerChoice]);
+                ResolveEffect(playerToAffect, currentHand.cards[playerToAffect.playerChoice]);
+                PlayerScores[playerResolutionIdx].text = playerToAffect.score.ToString();
             }
 
             // update the player resolution index
@@ -391,7 +390,11 @@ public class ManagerScript : MonoBehaviour
             }
         }
 
-        // TODO: destroy existing hand's instantiated cards to make way for the next hand
+        // destroy existing hand's instantiated cards to make way for the next hand
+        foreach(CardScript card in GameCanvas.GetComponentsInChildren<CardScript>())
+        {
+            Destroy(card.gameObject);
+        }
 
         if(winningPlayer)
         {
@@ -400,6 +403,25 @@ public class ManagerScript : MonoBehaviour
         else
         {
             DrawHand();
+        }
+    }
+
+    void ResolveEffect(PlayerScript playerToAffect, CardScript card)
+    {
+        // TODO: is a massive switch case the best answer here? should this be split up?
+        switch (card.CardID)
+        {
+            case CardScript.CardIDs.TestHandA:
+            case CardScript.CardIDs.TestHandB:
+            case CardScript.CardIDs.TestHandC:
+            case CardScript.CardIDs.NoID:
+            default:
+                playerToAffect.score += card.PointsDefault;
+                if(playerToAffect.threat)
+                {
+                    playerToAffect.score += card.ThreatPointsDefault;
+                }
+                break;
         }
     }
 }
