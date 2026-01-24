@@ -27,7 +27,7 @@ public class ManagerScript : MonoBehaviour
     [SerializeField] public float discussionTime; // time given between hand cards being revealed and the first player being made to choose
     float timeRemaining = 0.0f; // var to set and decrement as the timer
     bool discussionFlag = false;
-    bool playerTurnFlag = false;
+    bool delverTurnFlag = false;
 
     // hands that can be played in the game
     [SerializeField] public List<HandScript> Hands;
@@ -42,13 +42,24 @@ public class ManagerScript : MonoBehaviour
     int cardSpacing = 0;
 
     // players to be managed
-    [SerializeField] public List<PlayerScript> Players;
+    [SerializeField] public PlayerScript delver1;
+    [SerializeField] public PlayerScript delver2;
+    [SerializeField] public PlayerScript delver3;
+    [SerializeField] public PlayerScript delver4;
+    [SerializeField] public PlayerScript delver5;
+    [SerializeField] public PlayerScript delver6;
+    [SerializeField] public PlayerScript delver7;
+    [SerializeField] public PlayerScript delver8;
 
-    // player going first in a round
-    int FirstPlayerIdx = -1;
+    // list of players, to be arranged by score programatically as game progresses
+    public List<PlayerScript> delvers;
 
-    // player currently taking their turn
-    int CurrentPlayerIdx = -1;
+    // delver going first in a round
+    PlayerScript firstDelver;
+
+    // delver currently taking their turn
+    bool currentDelverSet = false;
+    PlayerScript currentDelver;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -63,8 +74,66 @@ public class ManagerScript : MonoBehaviour
         // initialize the card position var
         cardPos.Set(0, GameCanvas.pixelRect.height / 2);
 
-        // pick a random player to go first in the starting round
-        FirstPlayerIdx = UnityEngine.Random.Range(0, Players.Count());
+        // push all delvers into list
+        delvers.Add(delver1);
+        delvers.Add(delver2);
+        delvers.Add(delver3);
+        delvers.Add(delver4);
+        delvers.Add(delver5);
+        delvers.Add(delver6);
+        delvers.Add(delver7);
+        delvers.Add(delver8);
+        // connect all delvers to each other
+        delver1.rightDelver = delver2;
+        delver1.leftDelver = delver8;
+        delver2.rightDelver = delver3;
+        delver2.leftDelver = delver1;
+        delver3.rightDelver = delver4;
+        delver3.leftDelver = delver2;
+        delver4.rightDelver = delver5;
+        delver4.leftDelver = delver3;
+        delver5.rightDelver = delver6;
+        delver5.leftDelver = delver4;
+        delver6.rightDelver = delver7;
+        delver6.leftDelver = delver5;
+        delver7.rightDelver = delver8;
+        delver7.leftDelver = delver6;
+        delver8.rightDelver = delver1;
+        delver8.leftDelver = delver7;
+        // TODO: Don't hardcode this!
+        // Find a way to have the game dynamically connect delvers based on who picks what slots down the line.
+
+        // pick a random delver to go first in the starting round
+        // TODO: let players choose this by vote instead?
+        int firstDelverIdx = UnityEngine.Random.Range(0, delvers.Count());
+        switch(firstDelverIdx)
+        {
+            case 1:
+                firstDelver = delver2;
+                break;
+            case 2:
+                firstDelver = delver3;
+                break;
+            case 3:
+                firstDelver = delver4;
+                break;
+            case 4:
+                firstDelver = delver5;
+                break;
+            case 5:
+                firstDelver = delver6;
+                break;
+            case 6:
+                firstDelver = delver7;
+                break;
+            case 7:
+                firstDelver = delver8;
+                break;
+            case 0:
+            default:
+                firstDelver = delver1;
+                break;
+        }
     }
 
     // Update is called once per frame
@@ -74,11 +143,11 @@ public class ManagerScript : MonoBehaviour
         {
             // flip discussion/player turn flags
             discussionFlag = false;
-            playerTurnFlag = true;
+            delverTurnFlag = true;
             // initiate player choice for the player going first this round
             InitiatePlayerChoice();
         }
-        else if(playerTurnFlag && timeRemaining <= 0)
+        else if(delverTurnFlag && timeRemaining <= 0)
         {
             InitiatePlayerChoice();
         }
@@ -146,7 +215,7 @@ public class ManagerScript : MonoBehaviour
         // set discussion flag for main event loop to catch and work with
         discussionFlag = true;
         // update guide text
-        GuideText.text = "Discuss your choices now! Player " + (FirstPlayerIdx + 1) + " begins the decision-making process in...";
+        GuideText.text = "Discuss your choices now! Player " + firstDelver.delverID + " begins the decision-making process in...";
         // display timer text
         TimerText.text = Mathf.CeilToInt(timeRemaining).ToString();
         TimerText.gameObject.SetActive(true);
@@ -156,39 +225,31 @@ public class ManagerScript : MonoBehaviour
     void InitiatePlayerChoice()
     {
         // set current player to the player going first if this is the start of player selection
-        if(CurrentPlayerIdx < 0)
+        if(!currentDelverSet)
         {
-            CurrentPlayerIdx = FirstPlayerIdx;
+            currentDelver = firstDelver;
+            currentDelverSet = true;
         }
         // else increment the current player choosing
         else
         {
-            CurrentPlayerIdx++;
-            // handle wrap-around
-            if(CurrentPlayerIdx >= Players.Count())
-            {
-                CurrentPlayerIdx = 0;
-            }
+            currentDelver = currentDelver.rightDelver;
             // last player has already gone, player selection is over
-            if(CurrentPlayerIdx == FirstPlayerIdx)
+            if(currentDelver == firstDelver)
             {
                 // increment the starting player for the next round
-                FirstPlayerIdx = CurrentPlayerIdx + 1;
-                if(FirstPlayerIdx >= Players.Count())
-                {
-                    FirstPlayerIdx = 0;
-                }
-                // reset current player
-                CurrentPlayerIdx = -1;
+                firstDelver = firstDelver.rightDelver;
+                // reset current delver
+                currentDelverSet = false;
                 // unset the flag
-                playerTurnFlag = false;
+                delverTurnFlag = false;
             }
         }
         // a player is going to make their selection now
-        if(playerTurnFlag)
+        if(delverTurnFlag)
         {
             // update UI
-            GuideText.text = "Player " + (CurrentPlayerIdx + 1) + " make your decision now!";
+            GuideText.text = "Delver " + currentDelver.delverID + " make your decision now!";
             // reset timer
             timeRemaining = playerTurnTime;
             // reset timer text (should already be activated from the discussion)
@@ -207,43 +268,55 @@ public class ManagerScript : MonoBehaviour
     {
         Debug.Log("Pressed one of the buttons I care about!");
 
-        if(CurrentPlayerIdx < 0)
+        if(!currentDelverSet)
         {
-            Debug.Log("No player currently in control to make a choice!");
+            Debug.Log("No delver currently in control to make a choice!");
             return;
         }
         // lock in choices for whatever player is currently in play
         switch (context.action.name)
         {
             case "OptionA":
-                Players[CurrentPlayerIdx].playerChoice = 0;
+                currentDelver.actionIdx = 0;
                 break;
             case "OptionB":
-                Players[CurrentPlayerIdx].playerChoice = 1;
+                currentDelver.actionIdx = 1;
                 break;
             case "OptionC":
-                Players[CurrentPlayerIdx].playerChoice = 2;
+                currentDelver.actionIdx = 2;
                 break;
             case "OptionD":
-                Players[CurrentPlayerIdx].playerChoice = 3;
+                currentDelver.actionIdx = 3;
                 break;
             case "OptionE":
-                Players[CurrentPlayerIdx].playerChoice = 4;
+                currentDelver.actionIdx = 4;
                 break;
             case "ThreatAction":
-                Players[CurrentPlayerIdx].threatAction = true;
+                currentDelver.callToSpirit = true;
                 break;
             case "ChoosePlayer1":
-                Players[CurrentPlayerIdx].playerTargets.Add(1);
+                currentDelver.targets.Add(delver1);
                 break;
             case "ChoosePlayer2":
-                Players[CurrentPlayerIdx].playerTargets.Add(2);
+                currentDelver.targets.Add(delver2);
                 break;
             case "ChoosePlayer3":
-                Players[CurrentPlayerIdx].playerTargets.Add(3);
+                currentDelver.targets.Add(delver3);
                 break;
             case "ChoosePlayer4":
-                Players[CurrentPlayerIdx].playerTargets.Add(4);
+                currentDelver.targets.Add(delver4);
+                break;
+            case "ChoosePlayer5":
+                currentDelver.targets.Add(delver5);
+                break;
+            case "ChoosePlayer6":
+                currentDelver.targets.Add(delver6);
+                break;
+            case "ChoosePlayer7":
+                currentDelver.targets.Add(delver7);
+                break;
+            case "ChoosePlayer8":
+                currentDelver.targets.Add(delver8);
                 break;
             default:
                 break;
@@ -253,139 +326,18 @@ public class ManagerScript : MonoBehaviour
     // work to take players choices and resolve them here, updating threat status/health and point totals and bringing the game to its end state if necesary
     void ResolveTurn()
     {
-        // check who took the threat action
-        PlayerScript threatPlayer = null;
-        List<PlayerScript> threatActionPlayers = new List<PlayerScript>();
-        foreach(PlayerScript player in Players)
-        {
-            if(player.threat)
-            {
-                threatPlayer = player;
-            }
-
-            if(player.threatAction)
-            {
-                threatActionPlayers.Add(player);
-            }
-        }
-
-        // resolve changes in threat status
-        if(threatActionPlayers.Count > 0)
-        {
-            // someone is gaining threat status or failing their defense
-            if(threatActionPlayers.Count() == 1)
-            {
-                // failed defense, remove threat status
-                if(threatPlayer)
-                {
-                    threatPlayer.threat = false;
-                }
-                // successful threat activation, provide bonus and set flag
-                else
-                {
-                    threatPlayer = threatActionPlayers[0];
-                    threatPlayer.threat = true;
-                    threatPlayer.score += 5;
-                }
-            }
-            // players are fighting the threat
-            else if(threatPlayer)
-            {
-                // threat defended themselves
-                if(threatPlayer.threatAction)
-                {
-                    // threat succesfully defends themselves against multiple attackers
-                    if(threatActionPlayers.Count() > 2)
-                    {
-                        // deduct points from the dunces
-                        foreach(PlayerScript player in threatActionPlayers)
-                        {
-                            if(!player.threat)
-                            {
-                                player.score -= 2;
-                            }
-                        }
-                    }
-                    // defense was subverted by a single sneaky attacker, passing threat status to them
-                    else
-                    {
-                        foreach(PlayerScript player in threatActionPlayers)
-                        {
-                            if(player.threat)
-                            {
-                                player.threat = false;
-                                player.score -= 5;
-                            }
-                            else
-                            {
-                                player.threat = true;
-                                player.score += 5;
-                            }
-                        }
-                    }
-                }
-                // threat did not defend themselves, they lose threat status and points
-                else
-                {
-                    threatPlayer.threat = false;
-                    threatPlayer.score -= 5;
-                }
-            }
-            // multiple people unsuccessfully tried to become the threat at once
-            else
-            {
-                // deduct points from the dunces
-                foreach(PlayerScript player in threatActionPlayers)
-                {
-                    player.score -= 2;
-                }
-            }
-
-            // reset the threat action flag for everyone that took it
-            foreach(PlayerScript player in threatActionPlayers)
-            {
-                player.threatAction = false;
-            }
-        }
-
-        // resolve card choice effects
-        int playerResolutionIdx = FirstPlayerIdx;
-        PlayerScript playerToAffect = null;        
-        do
-        {
-            playerToAffect = Players[playerResolutionIdx];
-            // verify they chose a valid card option
-            // TODO: prevent this bad choice from being possible in the first place!
-            if(playerToAffect.playerChoice >= currentHand.cards.Count())
-            {
-                Debug.Log("Player " + (playerResolutionIdx + 1) + " chose a non-existant card! Are they stupid?");
-            }
-            else
-            {
-                // refer to the TABLE OF CARD EFFECTS to resolve players card choices
-                ResolveEffect(playerToAffect, currentHand.cards[playerToAffect.playerChoice]);
-                PlayerScores[playerResolutionIdx].text = playerToAffect.score.ToString();
-            }
-
-            // update the player resolution index
-            playerResolutionIdx++;
-            if(playerResolutionIdx == Players.Count())
-            {
-                playerResolutionIdx = 0;
-            }
-        } while (playerResolutionIdx != FirstPlayerIdx);
-
+        // TODO: use the new scenario scripts here...somehow!
         // determine if a winner exists
-        int winningScore = 20;
-        PlayerScript winningPlayer = null;
-        foreach(PlayerScript player in Players)
+        int maxTreasures = 20;
+        PlayerScript triumphantDelver = null;
+        foreach(PlayerScript delver in delvers)
         {
-            if(player.score >= winningScore)
+            if(delver.treasures >= maxTreasures)
             {
-                winningScore = player.score;
-                if(!winningPlayer || winningPlayer.score < winningScore || (winningPlayer.score == player.score && player.threat))
+                maxTreasures = delver.treasures;
+                if(!triumphantDelver || triumphantDelver.treasures < maxTreasures || (triumphantDelver.treasures == delver.treasures && delver.favored))
                 {
-                    winningPlayer = player;
+                    triumphantDelver = delver;
                 }
             }
         }
@@ -396,32 +348,13 @@ public class ManagerScript : MonoBehaviour
             Destroy(card.gameObject);
         }
 
-        if(winningPlayer)
+        if(triumphantDelver)
         {
             Debug.Log("Player has won the game!");
         }
         else
         {
             DrawHand();
-        }
-    }
-
-    void ResolveEffect(PlayerScript playerToAffect, CardScript card)
-    {
-        // TODO: is a massive switch case the best answer here? should this be split up?
-        switch (card.CardID)
-        {
-            case CardScript.CardIDs.TestHandA:
-            case CardScript.CardIDs.TestHandB:
-            case CardScript.CardIDs.TestHandC:
-            case CardScript.CardIDs.NoID:
-            default:
-                playerToAffect.score += card.PointsDefault;
-                if(playerToAffect.threat)
-                {
-                    playerToAffect.score += card.ThreatPointsDefault;
-                }
-                break;
         }
     }
 }
