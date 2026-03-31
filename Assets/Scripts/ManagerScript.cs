@@ -266,7 +266,7 @@ public class ManagerScript : MonoBehaviour
     // player input callbacks
     public void PlayerInputCallback(InputAction.CallbackContext context)
     {
-        Debug.Log("Pressed one of the buttons I care about!");
+        //Debug.Log("Pressed one of the buttons I care about!");
 
         if(!currentDelverSet)
         {
@@ -278,18 +278,23 @@ public class ManagerScript : MonoBehaviour
         {
             case "OptionA":
                 currentDelver.actionIdx = 0;
+                Debug.Log("Chose A");
                 break;
             case "OptionB":
                 currentDelver.actionIdx = 1;
+                Debug.Log("Chose B");
                 break;
             case "OptionC":
                 currentDelver.actionIdx = 2;
+                Debug.Log("Chose C");
                 break;
             case "OptionD":
                 currentDelver.actionIdx = 3;
+                Debug.Log("Chose D");
                 break;
             case "OptionE":
                 currentDelver.actionIdx = 4;
+                Debug.Log("Chose E");
                 break;
             case "ThreatAction":
                 currentDelver.callToSpirit = true;
@@ -327,6 +332,7 @@ public class ManagerScript : MonoBehaviour
     void ResolveTurn()
     {
         // TODO: use the new scenario scripts here...somehow!
+        Debug.Log("Turns are resolving btw");
         // determine if a winner exists
         int maxTreasures = 20;
         PlayerScript triumphantDelver = null;
