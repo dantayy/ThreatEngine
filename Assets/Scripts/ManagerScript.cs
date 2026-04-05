@@ -19,7 +19,6 @@ public class ManagerScript : MonoBehaviour
     [SerializeField] public TextMeshProUGUI GuideText;
     [SerializeField] public TextMeshProUGUI TimerText;
     // NOTE: put these gameobjects in this list in the same order as the playerscripts they are representing!
-    [SerializeField] public List<TextMeshProUGUI> PlayerScores;
 
 
     // timer-related fields
@@ -79,61 +78,31 @@ public class ManagerScript : MonoBehaviour
         delvers.Add(delver2);
         delvers.Add(delver3);
         delvers.Add(delver4);
-        delvers.Add(delver5);
-        delvers.Add(delver6);
-        delvers.Add(delver7);
-        delvers.Add(delver8);
+        //delvers.Add(delver5);
+        //delvers.Add(delver6);
+        //delvers.Add(delver7);
+        //delvers.Add(delver8);
+
         // connect all delvers to each other
-        delver1.rightDelver = delver2;
-        delver1.leftDelver = delver8;
-        delver2.rightDelver = delver3;
-        delver2.leftDelver = delver1;
-        delver3.rightDelver = delver4;
-        delver3.leftDelver = delver2;
-        delver4.rightDelver = delver5;
-        delver4.leftDelver = delver3;
-        delver5.rightDelver = delver6;
-        delver5.leftDelver = delver4;
-        delver6.rightDelver = delver7;
-        delver6.leftDelver = delver5;
-        delver7.rightDelver = delver8;
-        delver7.leftDelver = delver6;
-        delver8.rightDelver = delver1;
-        delver8.leftDelver = delver7;
-        // TODO: Don't hardcode this!
-        // Find a way to have the game dynamically connect delvers based on who picks what slots down the line.
+        for(int i = 0; i < delvers.Count; i++)
+        {
+            delvers[i].delverID = i + 1;
+            delvers[i].playerTitleText.text = "Player " + delvers[i].delverID;
+
+            int rightDelverIdx = i + 1;
+            int leftDelverIdx = i - 1;
+
+            // wrap around the list of delvers when necessary
+            if(i + 1 == delvers.Count) { rightDelverIdx = 0; }
+            if(i - 1 == -1) { leftDelverIdx = delvers.Count - 1; }
+
+            delvers[i].rightDelver = delvers[rightDelverIdx];
+            delvers[i].leftDelver = delvers[leftDelverIdx];
+        }
 
         // pick a random delver to go first in the starting round
         // TODO: let players choose this by vote instead?
-        int firstDelverIdx = UnityEngine.Random.Range(0, delvers.Count());
-        switch(firstDelverIdx)
-        {
-            case 1:
-                firstDelver = delver2;
-                break;
-            case 2:
-                firstDelver = delver3;
-                break;
-            case 3:
-                firstDelver = delver4;
-                break;
-            case 4:
-                firstDelver = delver5;
-                break;
-            case 5:
-                firstDelver = delver6;
-                break;
-            case 6:
-                firstDelver = delver7;
-                break;
-            case 7:
-                firstDelver = delver8;
-                break;
-            case 0:
-            default:
-                firstDelver = delver1;
-                break;
-        }
+        firstDelver = delvers[UnityEngine.Random.Range(0, delvers.Count())];
     }
 
     // Update is called once per frame
@@ -215,7 +184,7 @@ public class ManagerScript : MonoBehaviour
         // set discussion flag for main event loop to catch and work with
         discussionFlag = true;
         // update guide text
-        GuideText.text = "Discuss your choices now! Player " + firstDelver.delverID + " begins the decision-making process in...";
+        GuideText.text = "Discuss your choices now! Delver " + firstDelver.delverID + " begins the decision-making process in...";
         // display timer text
         TimerText.text = Mathf.CeilToInt(timeRemaining).ToString();
         TimerText.gameObject.SetActive(true);
@@ -268,7 +237,7 @@ public class ManagerScript : MonoBehaviour
     {
         //Debug.Log("Pressed one of the buttons I care about!");
 
-        if(!currentDelverSet)
+        if (!currentDelverSet)
         {
             Debug.Log("No delver currently in control to make a choice!");
             return;
@@ -279,22 +248,31 @@ public class ManagerScript : MonoBehaviour
             case "OptionA":
                 currentDelver.actionIdx = 0;
                 Debug.Log("Chose A");
+                currentDelver.playerScoreText.text = "Chose A";
                 break;
             case "OptionB":
                 currentDelver.actionIdx = 1;
                 Debug.Log("Chose B");
+                currentDelver.playerScoreText.text = "Chose B";
                 break;
             case "OptionC":
                 currentDelver.actionIdx = 2;
                 Debug.Log("Chose C");
+                currentDelver.playerScoreText.text = "Chose C";
                 break;
             case "OptionD":
                 currentDelver.actionIdx = 3;
                 Debug.Log("Chose D");
+                currentDelver.playerScoreText.text = "Chose D";
                 break;
             case "OptionE":
                 currentDelver.actionIdx = 4;
                 Debug.Log("Chose E");
+                currentDelver.playerScoreText.text = "Chose E";
+                break;
+            case "Confirm":
+                Debug.Log("Confirming");
+                if(currentDelver.actionIdx != -1) { timeRemaining = 0; }
                 break;
             case "ThreatAction":
                 currentDelver.callToSpirit = true;

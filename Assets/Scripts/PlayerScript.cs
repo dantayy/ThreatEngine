@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
@@ -20,10 +21,16 @@ public class PlayerScript : MonoBehaviour
     // target(s) delver picks when taking certain actions
     public List<PlayerScript> targets;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private GameObject playerCanvas;
+    public TextMeshProUGUI playerTitleText;
+    public TextMeshProUGUI playerScoreText;
+
+    // Awake is called before Start
+    void Awake()
     {
-        
+        playerCanvas = transform.Find("PlayerCanvas").gameObject;
+        playerTitleText = playerCanvas.transform.Find("PlayerTitleText").GetComponent<TextMeshProUGUI>();
+        playerScoreText = playerCanvas.transform.Find("PlayerScoreText").GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
