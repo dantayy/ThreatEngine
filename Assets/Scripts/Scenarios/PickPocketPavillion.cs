@@ -10,15 +10,17 @@ public class PickPocketPavillion : ScenarioScript
         actionTitles[0] = "Scoop loot from the fountain";
         actionTitles[1] = "Hit and run";
         actionTitles[2] = "Make room for bigger treasures";
+        actionEffects[0] = "+3 [+3]";
+        actionEffects[1] = "Pick a player. Steal 2 from them. [Steal 1 from all other opponents.]";
+        actionEffects[2] = "+4 [+2] per player who steals from you.";
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delvers, PlayerScript firstDelver)
+    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // look at each delver's action choice
         PlayerScript currentDelver = firstDelver;
         do
         {
-
             // handle each possible action choice
             switch (currentDelver.actionIdx)
             {
@@ -46,9 +48,9 @@ public class PickPocketPavillion : ScenarioScript
                         if (currentDelver.favored)
                         {
                             // add treasures for every other player
-                            currentDelver.treasures += delvers.Count - 2;
+                            currentDelver.treasures += delversSortedScores.Count - 2;
                             // take from every other player
-                            foreach (PlayerScript target in delvers)
+                            foreach (PlayerScript target in delversSortedScores)
                             {
                                 if (
                                     target.delverID != currentDelver.delverID &&
@@ -61,9 +63,10 @@ public class PickPocketPavillion : ScenarioScript
                         }
                         break;
                     }
+                // make room for bigger treasures
                 case 2:
                     // determine who has stolen from this delver
-                    foreach (PlayerScript potentialThief in delvers)
+                    foreach (PlayerScript potentialThief in delversSortedScores)
                     {
                         if (potentialThief.targets[potentialThief.targets.Count - 1] == currentDelver)
                         {
@@ -81,6 +84,11 @@ public class PickPocketPavillion : ScenarioScript
                 default:
                     break;
             }
+
+            // re-sort delver scores list
+            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
+
+            // move to next delver in turn order
             currentDelver = currentDelver.rightDelver;
         } while (currentDelver != firstDelver);
     }
