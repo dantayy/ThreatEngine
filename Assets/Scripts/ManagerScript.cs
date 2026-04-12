@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,17 +29,13 @@ public class ManagerScript : MonoBehaviour
     bool discussionFlag = false;
     bool delverTurnFlag = false;
 
-    // hands that can be played in the game
-    [SerializeField] public List<HandScript> Hands;
-    [SerializeField] GameObject cardPrefab;
+    // one scenario is randomly selected each round
+    [SerializeField] public List<ScenarioScript> Scenarios;
+    ScenarioScript currentScenario;
 
-    // hand currently being played
-    HandScript currentHand;
-
-    // dynamic position to place cards with
-    Vector2 cardPos = new Vector2();
-    // dynamic spacing between cards
-    int cardSpacing = 0;
+    // UI elements for displaying scenario option details
+    public List<OptionScript> optionDisplays;
+    private string[] optionIDs = { "A", "B", "C", "D" };
 
     // players to be managed
     [SerializeField] public PlayerScript delver1;
@@ -50,7 +47,7 @@ public class ManagerScript : MonoBehaviour
     [SerializeField] public PlayerScript delver7;
     [SerializeField] public PlayerScript delver8;
 
-    // list of players, to be arranged by score programatically as game progresses
+    // list of players
     public List<PlayerScript> delvers;
 
     // delver going first in a round
@@ -70,9 +67,6 @@ public class ManagerScript : MonoBehaviour
         // make the play button initiate the main game state
         StartButton.onClick.AddListener(InitiatePlayLoop);
 
-        // initialize the card position var
-        cardPos.Set(0, GameCanvas.pixelRect.height / 2);
-
         // push all delvers into list
         delvers.Add(delver1);
         delvers.Add(delver2);
@@ -83,7 +77,7 @@ public class ManagerScript : MonoBehaviour
         //delvers.Add(delver7);
         //delvers.Add(delver8);
 
-        // connect all delvers to each other
+        // connect all delvers to each other relatively
         for(int i = 0; i < delvers.Count; i++)
         {
             delvers[i].delverID = i + 1;
@@ -133,7 +127,7 @@ public class ManagerScript : MonoBehaviour
         }
     }
 
-    // set up the main play screen and draw the first hand of cards for players to pick from
+    // set up the main play screen and select a scenario
     void InitiatePlayLoop()
     {
         // hide start button
@@ -143,40 +137,33 @@ public class ManagerScript : MonoBehaviour
         GuideText.text = "Starting...";
         GuideText.enabled = true;
 
-        // no hands to pull from, abort
-        if(Hands.Count == 0)
+        // no scenarios to pull from, abort
+        if(Scenarios.Count == 0)
         {
-            Debug.Log("No hands set up to draw! Aborting!!!");
+            Debug.Log("No scenarios available! Aborting!!!");
             Application.Quit();
         }
         else
         {
-            DrawHand();
+            DisplayScenarioOptions();
         }
     }
 
-    // draw a hand of cards to show the players
-    void DrawHand()
+    // select a scenario and display its options for players to choose
+    void DisplayScenarioOptions()
     {
-        // select a random hand from the list
-        currentHand = Hands[UnityEngine.Random.Range(0, Hands.Count)];
+        // select a random scenario from the list
+        currentScenario = Scenarios[UnityEngine.Random.Range(0, Scenarios.Count)];
 
-        // set spacing according to number of cards
-        cardSpacing = (int)(GameCanvas.pixelRect.width) / (currentHand.cards.Count + 1);
-
-        // set initial x position for first card
-        cardPos.x = cardSpacing;
-
-        // take each card from the selected hand and put them on the screen
-        GameObject cardRef;
-        foreach(CardScript card in currentHand.cards)
+        // fill the option prefabs with this scenario's information
+        for (int i = 0; i < currentScenario.actionTitles.Count; i++)
         {
-            cardRef = Instantiate(card.gameObject);
-            cardRef.transform.SetParent(GameCanvas.gameObject.transform);
-            // move card to predetermined location
-            cardRef.transform.SetPositionAndRotation(cardPos, Quaternion.identity);
-            // update card position for next card
-            cardPos.x += cardSpacing;
+            OptionScript currentOption = optionDisplays[i];
+            currentOption.gameObject.SetActive(true);
+            currentOption.title = currentScenario.actionTitles[i];
+            currentOption.effect = currentScenario.actionEffects[i];
+            currentOption.id = optionIDs[i];
+            currentOption.DisplayOption();
         }
 
         // initiate discussion timer
@@ -338,7 +325,7 @@ public class ManagerScript : MonoBehaviour
         }
         else
         {
-            DrawHand();
+            DisplayScenarioOptions();
         }
     }
 }

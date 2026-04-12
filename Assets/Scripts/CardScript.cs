@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-// class holding stats for a card in our threat engine game
-// should be attached to the Card prefab and set its visual attributes based on the associated fields in this script
+// class holding parameters for a single scenario option
+// should be attached to the OptionPrefab and set its visual attributes based on the associated fields in this script
 // includes a pure virtual function to be implemented by children that will be called by the game manager to determine score changes for players that pick the card
 public class CardScript : MonoBehaviour
 {

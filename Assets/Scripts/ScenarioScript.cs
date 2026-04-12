@@ -8,10 +8,10 @@ public abstract class ScenarioScript : ScriptableObject
     // flavorful name of the scenario delvers have to overcome
     [field: SerializeField] public string scenarioTitle;
     // flavorful titles of the actions that can be taken in this scenario that will affect scores
-    [field: SerializeField] public string[] actionTitles = {"-","-","-","-","-",};
+    [System.NonSerialized] public List<string> actionTitles = new List<string>();
     // mechanical descriptions of the outcomes of the actions being selected
     // TODO: use something other than the string type so we can write with more than plaintext
-    [field: SerializeField] public string[] actionEffects = { "-", "-", "-", "-", "-", };
+    [System.NonSerialized] public List<string> actionEffects = new List<string>();
 
     // resolve scenario
     public void ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)

@@ -7,12 +7,14 @@ public class PickPocketPavillion : ScenarioScript
     public PickPocketPavillion()
     {
         scenarioTitle = "The Pickpocket Pavillion";
-        actionTitles[0] = "Scoop loot from the fountain";
-        actionTitles[1] = "Hit and run";
-        actionTitles[2] = "Make room for bigger treasures";
-        actionEffects[0] = "+3 [+3]";
-        actionEffects[1] = "Pick a player. Steal 2 from them. [Steal 1 from all other opponents.]";
-        actionEffects[2] = "+4 [+2] per player who steals from you.";
+
+        actionTitles.Add("Scoop loot from the fountain");
+        actionTitles.Add("Hit and run");
+        actionTitles.Add("Make room for bigger treasures");
+
+        actionEffects.Add("+3 [+3]");
+        actionEffects.Add("Pick a player. Steal 2 from them. [Steal 1 from all other opponents.]");
+        actionEffects.Add("+4 [+2] per player who steals from you.");
     }
 
     protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)

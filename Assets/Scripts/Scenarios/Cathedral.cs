@@ -7,12 +7,14 @@ public class Cathedral : ScenarioScript
     public Cathedral()
     {
         scenarioTitle = "The Cathedral";
-        actionTitles[0] = "Pray alone";
-        actionTitles[1] = "Take from the offering bin";
-        actionTitles[2] = "Break the marble effigy together";
-        actionEffects[0] = "+5 [+3] IF only you choose this";
-        actionEffects[1] = "+1 [+2]";
-        actionEffects[2] = "+4 [+2] IF everyone chooses this";
+        
+        actionTitles.Add("Pray alone");
+        actionTitles.Add("Take from the offering bin");
+        actionTitles.Add("Break the marble effigy together");
+
+        actionEffects.Add("+5 [+3] IF only you choose this");
+        actionEffects.Add("+1 [+2]");
+        actionEffects.Add("+4 [+2] IF everyone chooses this");
     }
 
     protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
