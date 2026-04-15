@@ -30,12 +30,12 @@ public class PickPocketPavillion : ScenarioScript
                 case 0:
                     {
                         // add to delver's treasures
-                        currentDelver.treasures += 3;
+                        TreasureAdjustment(currentDelver, 3);
                         // favored bonus
                         if (currentDelver.favored)
                         {
                             // add to delver's treasures
-                            currentDelver.treasures += 3;
+                            TreasureAdjustment(currentDelver, 3);
                         }
                         break;
                     }
@@ -43,14 +43,14 @@ public class PickPocketPavillion : ScenarioScript
                 case 1:
                     {
                         // add to delver's treasures
-                        currentDelver.treasures += 2;
+                        TreasureAdjustment(currentDelver, 2);
                         // take from target's treasures
-                        currentDelver.targets[currentDelver.targets.Count - 1].treasures -= 2;
+                        TreasureAdjustment(currentDelver.targets[currentDelver.targets.Count - 1], -2);
                         // favored bonus
                         if (currentDelver.favored)
                         {
                             // add treasures for every other player
-                            currentDelver.treasures += delversSortedScores.Count - 2;
+                            TreasureAdjustment(currentDelver, delversSortedScores.Count - 2);
                             // take from every other player
                             foreach (PlayerScript target in delversSortedScores)
                             {
@@ -59,7 +59,7 @@ public class PickPocketPavillion : ScenarioScript
                                     target.delverID != currentDelver.targets[currentDelver.targets.Count - 1].delverID
                                 )
                                 {
-                                    target.treasures--;
+                                    TreasureAdjustment(target, -1);
                                 }
                             }
                         }
@@ -73,12 +73,12 @@ public class PickPocketPavillion : ScenarioScript
                         if (potentialThief.targets[potentialThief.targets.Count - 1] == currentDelver)
                         {
                             // add treasures when stolen from
-                            currentDelver.treasures += 4;
+                            TreasureAdjustment(currentDelver, 4);
                             // favored bonus
                             if (currentDelver.favored)
                             {
                                 // add to delver's treasures
-                                currentDelver.treasures += 2;
+                                TreasureAdjustment(currentDelver, 2);
                             }
                         }
                     }

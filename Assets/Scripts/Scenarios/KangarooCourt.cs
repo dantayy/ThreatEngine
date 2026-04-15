@@ -9,13 +9,11 @@ public class KangarooCourt : ScenarioScript
     {
         scenarioTitle = "The Kangaroo Court";
 
-        actionTitles.Add("Lift the gavel");
         actionTitles.Add("Trapped in the holding cell");
         actionTitles.Add("Balance the scale");
         actionTitles.Add("Unbalance the scale");
         actionTitles.Add("Destroy the scale");
 
-        actionEffects.Add("+1 [+4]");
         actionEffects.Add("-3 [0]");
         actionEffects.Add("+5 for last place delver(s) [+3]");
         actionEffects.Add("-5 for first place delver(s) [+5]");
@@ -34,35 +32,22 @@ public class KangarooCourt : ScenarioScript
             // handle each possible action choice
             switch (currentDelver.actionIdx)
             {
-                // lift the gavel
+                // trapped in the holding cell
                 case 0:
                     {
-                        // add to delver's treasures
-                        currentDelver.treasures += 1;
-                        // favored bonus
-                        if (currentDelver.favored)
-                        {
-                            // add to delver's treasures
-                            currentDelver.treasures += 4;
-                        }
-                        break;
-                    }
-                // trapped in the holding cell
-                case 1:
-                    {
-                        // add to delver's treasures
-                        currentDelver.treasures -= 3;
+                        // remove from delver's treasures
+                        TreasureAdjustment(currentDelver, -3);
                         break;
                     }
                 // balance the scale
-                case 2:
+                case 1:
                     {
                         // add treasures to last place delver(s)
                         for(int i = delversSortedScores.Count - 1; i >= 0; i--)
                         {
                             if(delversSortedScores[i].treasures == lowestTreasures)
                             {
-                                delversSortedScores[i].treasures += 5;
+                                TreasureAdjustment(delversSortedScores[i], 5);
                             }
                             else
                             {
@@ -72,19 +57,19 @@ public class KangarooCourt : ScenarioScript
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            currentDelver.treasures += 3;
+                            TreasureAdjustment(currentDelver, 3);
                         }
                         break;
                     }
                 // unbalance the scale
-                case 3:
+                case 2:
                     {
                         // remove treasures from first place delver(s)
                         for(int i = 0; i < delversSortedScores.Count; i++)
                         {
                             if(delversSortedScores[i].treasures == highestTreasures)
                             {
-                                delversSortedScores[i].treasures -= 5;
+                                TreasureAdjustment(delversSortedScores[i], -5);
                             }
                             else
                             {
@@ -94,27 +79,27 @@ public class KangarooCourt : ScenarioScript
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            currentDelver.treasures += 5;
+                            TreasureAdjustment(currentDelver, 5);
                         }
                         break;
                     }
-                case 4:
+                case 3:
                     {
                         // manipulate treasures of all delvers not in first or last place
-                        for(int i = 0; i < delversSortedScores.Count; i++)
+                        for(int i = 1; i < delversSortedScores.Count - 1; i++)
                         {
                             if(delversSortedScores[i].treasures != highestTreasures && delversSortedScores[i].treasures != lowestTreasures)
                             {
                                 // steal from everyone in the middle when favored
                                 if(currentDelver.favored)
                                 {
-                                    delversSortedScores[i].treasures -= 3;
-                                    currentDelver.treasures += 3;
+                                    TreasureAdjustment(delversSortedScores[i], -3);
+                                    TreasureAdjustment(currentDelver, 3);
                                 }
                                 // boost everyone in the middle
                                 else
                                 {
-                                    delversSortedScores[i].treasures += 3;
+                                    TreasureAdjustment(delversSortedScores[i], 3);
                                 }
                             }
                         }

@@ -16,7 +16,9 @@ public abstract class ScenarioScript : ScriptableObject
     // resolve scenario
     public void ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)
     {
+        Debug.Log("Resolving spirit calls");
         SpiritCallingResolutions(delversSortedScores);
+        Debug.Log("Resolving actions for " + name);
         ActionResolutions(delversSortedScores, delverGoingFirst);
     }
 
@@ -78,7 +80,7 @@ public abstract class ScenarioScript : ScriptableObject
                         // non-favored delver misdirected by the spirit, loses a few treasures in the process
                         if (!caller.favored)
                         {
-                            caller.treasures -= 2;
+                            TreasureAdjustment(caller, -2);
                             break;
                         }
                     }
@@ -86,7 +88,7 @@ public abstract class ScenarioScript : ScriptableObject
                 // spirit overwhelmed by cacophany from within and without, abandoning favored and taking many treasures back with them
                 else
                 {
-                    currentlyFavored.treasures -= 5;
+                    TreasureAdjustment(currentlyFavored, -5);
                     currentlyFavored.favored = false;
                 }
             }
@@ -96,16 +98,16 @@ public abstract class ScenarioScript : ScriptableObject
                 // spirit loses connection with favored, takes a few treasures with them as they leave to spectate the rest of the competition
                 if (calledToSpirit.Count == 0)
                 {
-                    currentlyFavored.treasures -= 2;
+                    TreasureAdjustment(currentlyFavored, -2);
                     currentlyFavored.favored = false;
                 }
                 // spirit is swayed by a new singular voice, taking many treasures with them to their new favored
                 else if (calledToSpirit.Count == 1)
                 {
-                    currentlyFavored.treasures -= 5;
+                    TreasureAdjustment(currentlyFavored, -5);
                     currentlyFavored.favored = false;
 
-                    calledToSpirit[0].treasures += 5;
+                    TreasureAdjustment(calledToSpirit[0], 5);
                     calledToSpirit[0].favored = true;
                 }
                 // spirit finds calm in mind of favored when confronted by cacophany of compeititors, causes offenders to lose a few treasures
@@ -113,7 +115,7 @@ public abstract class ScenarioScript : ScriptableObject
                 {
                     foreach (PlayerScript delver in calledToSpirit)
                     {
-                        delver.treasures -= 2;
+                        TreasureAdjustment(delver, -2);
                     }
                 }
             }
@@ -130,14 +132,14 @@ public abstract class ScenarioScript : ScriptableObject
             else if (calledToSpirit.Count == 1)
             {
                 calledToSpirit[0].favored = true;
-                calledToSpirit[0].treasures += 2;   
+                TreasureAdjustment(calledToSpirit[0], 2);   
             }
             // too many voices call to spirit, causing them to misdirect all who participated and lose a few treasures in the process
             else
             {
                 foreach (PlayerScript caller in calledToSpirit)
                 {
-                    caller.treasures -= 2;
+                    TreasureAdjustment(caller, -2);
                 }
             }
         }
@@ -151,4 +153,11 @@ public abstract class ScenarioScript : ScriptableObject
 
     // resolve players' action choices (implement in child scripts)
     protected virtual void ActionResolutions(List<PlayerScript> delverSortedScores, PlayerScript delverGoingFirst) { }
+
+    protected void TreasureAdjustment(PlayerScript delver, int treasureDelta)
+    {
+        // log change for debugging (WILL slow things down if left on in release)
+        Debug.Log("Delver with ID " + delver.delverID + " has gained/lost " + treasureDelta + " treasures.");
+        delver.treasures += treasureDelta;
+    }
 }

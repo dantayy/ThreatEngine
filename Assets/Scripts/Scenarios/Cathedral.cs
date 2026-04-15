@@ -54,12 +54,12 @@ public class Cathedral : ScenarioScript
                         if(prayingAlone)
                         {
                             // add to delver's treasures
-                            currentDelver.treasures += 5;
+                            TreasureAdjustment(currentDelver, 5);
                             // favored bonus
                             if (currentDelver.favored)
                             {
                                 // add to delver's treasures
-                                currentDelver.treasures += 3;
+                                TreasureAdjustment(currentDelver, 3);
                             }
                         }
                         // can't be breaking the effigy together if someone is praying alone
@@ -70,11 +70,11 @@ public class Cathedral : ScenarioScript
                 case 1:
                     {
                         // add to delver's treasures
-                        currentDelver.treasures += 1;
+                        TreasureAdjustment(currentDelver, 1);
                         // favored bonus
                         if (currentDelver.favored)
                         {
-                            currentDelver.treasures += 2;
+                            TreasureAdjustment(currentDelver, 2);
                         }
                         // can't be breaking the effigy together if someone is taking from the offering bin
                         breakCheck = true;
@@ -112,12 +112,12 @@ public class Cathedral : ScenarioScript
                         if(breakingTogether)
                         {
                             // add to delver's treasures
-                            currentDelver.treasures += 4;
+                            TreasureAdjustment(currentDelver, 4);
                             // favored bonus
                             if (currentDelver.favored)
                             {
                                 // add to delver's treasures
-                                currentDelver.treasures += 2;
+                                TreasureAdjustment(currentDelver, 2);
                             }
                         }
                         break;
