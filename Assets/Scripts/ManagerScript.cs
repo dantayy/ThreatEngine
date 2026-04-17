@@ -32,6 +32,7 @@ public class ManagerScript : MonoBehaviour
     // one scenario is randomly selected each round
     [SerializeField] public List<ScenarioScript> Scenarios;
     ScenarioScript currentScenario;
+    int currentScenarioOptionCount = 0;
 
     // UI elements for displaying scenario option details
     public List<OptionScript> optionDisplays;
@@ -145,18 +146,19 @@ public class ManagerScript : MonoBehaviour
         }
         else
         {
-            DisplayScenarioOptions();
+            SetUpScenario();
         }
     }
 
     // select a scenario and display its options for players to choose
-    void DisplayScenarioOptions()
+    void SetUpScenario()
     {
         // select a random scenario from the list
         currentScenario = Scenarios[UnityEngine.Random.Range(0, Scenarios.Count)];
+        currentScenarioOptionCount = currentScenario.actionTitles.Count;
 
         // fill the option prefabs with this scenario's information
-        for (int i = 0; i < currentScenario.actionTitles.Count; i++)
+        for (int i = 0; i < currentScenarioOptionCount; i++)
         {
             OptionScript currentOption = optionDisplays[i];
             currentOption.gameObject.SetActive(true);
@@ -234,28 +236,22 @@ public class ManagerScript : MonoBehaviour
         {
             case "OptionA":
                 currentDelver.actionIdx = 0;
-                Debug.Log("Chose A");
-                currentDelver.playerScoreText.text = "Chose A";
+                currentDelver.playerDebugText.text = "Chose A";
                 break;
             case "OptionB":
+                if (currentScenarioOptionCount <= 1) { break; }
                 currentDelver.actionIdx = 1;
-                Debug.Log("Chose B");
-                currentDelver.playerScoreText.text = "Chose B";
+                currentDelver.playerDebugText.text = "Chose B";
                 break;
             case "OptionC":
+                if (currentScenarioOptionCount <= 2) { break; }
                 currentDelver.actionIdx = 2;
-                Debug.Log("Chose C");
-                currentDelver.playerScoreText.text = "Chose C";
+                currentDelver.playerDebugText.text = "Chose C";
                 break;
             case "OptionD":
+                if(currentScenarioOptionCount <= 3) { break; }
                 currentDelver.actionIdx = 3;
-                Debug.Log("Chose D");
-                currentDelver.playerScoreText.text = "Chose D";
-                break;
-            case "OptionE":
-                currentDelver.actionIdx = 4;
-                Debug.Log("Chose E");
-                currentDelver.playerScoreText.text = "Chose E";
+                currentDelver.playerDebugText.text = "Chose D";
                 break;
             case "Confirm":
                 Debug.Log("Confirming");
@@ -296,8 +292,12 @@ public class ManagerScript : MonoBehaviour
     // work to take players choices and resolve them here, updating threat status/health and point totals and bringing the game to its end state if necesary
     void ResolveTurn()
     {
-        // TODO: use the new scenario scripts here...somehow!
-        Debug.Log("Turns are resolving btw");
+        // resolve the scenario
+        List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
+        currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
+
+
+
         // determine if a winner exists
         int maxTreasures = 20;
         PlayerScript triumphantDelver = null;
@@ -321,11 +321,11 @@ public class ManagerScript : MonoBehaviour
 
         if(triumphantDelver)
         {
-            Debug.Log("Player has won the game!");
+            Debug.Log(triumphantDelver.name +  " has won the game!");
         }
         else
         {
-            DisplayScenarioOptions();
+            SetUpScenario();
         }
     }
 }

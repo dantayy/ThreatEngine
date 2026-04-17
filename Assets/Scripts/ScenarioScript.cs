@@ -157,7 +157,8 @@ public abstract class ScenarioScript : ScriptableObject
     protected void TreasureAdjustment(PlayerScript delver, int treasureDelta)
     {
         // log change for debugging (WILL slow things down if left on in release)
-        Debug.Log("Delver with ID " + delver.delverID + " has gained/lost " + treasureDelta + " treasures.");
+        Debug.Log("Delver with ID " + delver.delverID + " gets " + treasureDelta + " treasures.");
         delver.treasures += treasureDelta;
+        delver.playerScoreText.text = delver.treasures.ToString();
     }
 }
