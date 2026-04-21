@@ -752,6 +752,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: -200
       objectReference: {fileID: 0}
+    - target: {fileID: 631889708015453299, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -200
+      objectReference: {fileID: 0}
     - target: {fileID: 3555401369029318624, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab (1)
@@ -841,9 +845,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1540712660}
     - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_ActionEvents.Array.data[29].m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayerInputCallback
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1504,9 +1516,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1540712660}
     - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_ActionEvents.Array.data[29].m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayerInputCallback
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1521,6 +1541,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 363103899815882258, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 631889708015453299, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 200
       objectReference: {fileID: 0}
@@ -1613,9 +1637,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1540712660}
     - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_ActionEvents.Array.data[29].m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayerInputCallback
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1723,6 +1755,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 600
       objectReference: {fileID: 0}
+    - target: {fileID: 631889708015453299, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 600
+      objectReference: {fileID: 0}
     - target: {fileID: 3555401369029318624, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_Name
       value: PlayerPrefab (3)
@@ -1812,9 +1848,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1540712660}
     - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
       propertyPath: m_ActionEvents.Array.data[29].m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1540712660}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8765600512675069766, guid: 899e5cde271a20945a48858e895900bb, type: 3}
+      propertyPath: m_ActionEvents.Array.data[28].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlayerInputCallback
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

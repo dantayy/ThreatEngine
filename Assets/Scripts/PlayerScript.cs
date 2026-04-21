@@ -24,6 +24,7 @@ public class PlayerScript : MonoBehaviour
     private GameObject playerCanvas;
     public TextMeshProUGUI playerTitleText;
     public TextMeshProUGUI playerScoreText;
+    public TextMeshProUGUI playerDebugText;
 
     // Awake is called before Start
     void Awake()
@@ -31,6 +32,7 @@ public class PlayerScript : MonoBehaviour
         playerCanvas = transform.Find("PlayerCanvas").gameObject;
         playerTitleText = playerCanvas.transform.Find("PlayerTitleText").GetComponent<TextMeshProUGUI>();
         playerScoreText = playerCanvas.transform.Find("PlayerScoreText").GetComponent<TextMeshProUGUI>();
+        playerDebugText = playerCanvas.transform.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
