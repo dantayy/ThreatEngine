@@ -1380,6 +1380,8 @@ MonoBehaviour:
   Scenarios:
   - {fileID: 11400000, guid: 14bc55d1e8714fa4ca4cfda8a938781a, type: 2}
   - {fileID: 11400000, guid: 3dcf12672b9eaca4a9292b777f5175a2, type: 2}
+  - {fileID: 11400000, guid: 2944c597a27575d40af9e362c0802f8f, type: 2}
+  - {fileID: 11400000, guid: a491eac9bde64bb4397e783eaa044108, type: 2}
   optionDisplays:
   - {fileID: 2017141035}
   - {fileID: 2086075914}
