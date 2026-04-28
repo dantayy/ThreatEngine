@@ -676,6 +676,17 @@
                 {
                     "name": "",
                     "id": "865716bc-821f-46da-8bda-afaa768ba5dc",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "OptionD",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cd6f79c4-3189-496a-a746-16e253e45917",
                     "path": "<Keyboard>/downArrow",
                     "interactions": "",
                     "processors": "",

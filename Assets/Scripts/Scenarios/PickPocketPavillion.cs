@@ -45,7 +45,7 @@ public class PickPocketPavillion : ScenarioScript
                         // add to delver's treasures
                         TreasureAdjustment(currentDelver, 2);
                         // take from target's treasures
-                        TreasureAdjustment(currentDelver.targets[currentDelver.targets.Count - 1], -2);
+                        TreasureAdjustment(currentDelver.target, -2);
                         // favored bonus
                         if (currentDelver.favored)
                         {
@@ -56,7 +56,7 @@ public class PickPocketPavillion : ScenarioScript
                             {
                                 if (
                                     target.delverID != currentDelver.delverID &&
-                                    target.delverID != currentDelver.targets[currentDelver.targets.Count - 1].delverID
+                                    target.delverID != currentDelver.target.delverID
                                 )
                                 {
                                     TreasureAdjustment(target, -1);
@@ -70,7 +70,7 @@ public class PickPocketPavillion : ScenarioScript
                     // determine who has stolen from this delver
                     foreach (PlayerScript potentialThief in delversSortedScores)
                     {
-                        if (potentialThief.targets[potentialThief.targets.Count - 1] == currentDelver)
+                        if (potentialThief.target == currentDelver)
                         {
                             // add treasures when stolen from
                             TreasureAdjustment(currentDelver, 4);

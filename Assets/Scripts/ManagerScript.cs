@@ -164,7 +164,6 @@ public class ManagerScript : MonoBehaviour
             currentOption.gameObject.SetActive(true);
             currentOption.title = currentScenario.actionTitles[i];
             currentOption.effect = currentScenario.actionEffects[i];
-            currentOption.id = optionIDs[i];
             currentOption.DisplayOption();
         }
 
@@ -177,6 +176,11 @@ public class ManagerScript : MonoBehaviour
         // display timer text
         TimerText.text = Mathf.CeilToInt(timeRemaining).ToString();
         TimerText.gameObject.SetActive(true);
+        // display player targeting inputs
+        foreach(PlayerScript delver in delvers)
+        {
+            delver.playerInputIcons.SetActive(true);
+        }
     }
  
     // set up a player to make a choice
@@ -216,6 +220,15 @@ public class ManagerScript : MonoBehaviour
         // resolve the turn with all choices made
         else
         {
+            // if any players didn't make choices in time, make a random choice for them and mark them to receive a penalty
+            foreach(PlayerScript delver in delvers)
+            {
+                int randomDelver = UnityEngine.Random.Range(0, currentScenarioOptionCount);
+                if (delver.actionIdx == -1) { delver.actionIdx = randomDelver; }
+                if(delver.target == null) { delver.target = delvers[UnityEngine.Random.Range(0, delvers.Count)]; }
+                delver.choseRandomly = true;
+                currentDelver.playerDebugText.text = "Chose Randomly (" + optionIDs[randomDelver] + ")";
+            }
             GuideText.text = "Selections made! Resolving choices now...";
             ResolveTurn();
         }
@@ -254,35 +267,35 @@ public class ManagerScript : MonoBehaviour
                 currentDelver.playerDebugText.text = "Chose D";
                 break;
             case "Confirm":
-                Debug.Log("Confirming");
+                Debug.Log("Confirming choice");
                 if(currentDelver.actionIdx != -1) { timeRemaining = 0; }
                 break;
             case "ThreatAction":
                 currentDelver.callToSpirit = true;
                 break;
             case "ChoosePlayer1":
-                currentDelver.targets.Add(delver1);
+                currentDelver.target = delver1;
                 break;
             case "ChoosePlayer2":
-                currentDelver.targets.Add(delver2);
+                currentDelver.target = delver2;
                 break;
             case "ChoosePlayer3":
-                currentDelver.targets.Add(delver3);
+                currentDelver.target = delver3;
                 break;
             case "ChoosePlayer4":
-                currentDelver.targets.Add(delver4);
+                currentDelver.target = delver4;
                 break;
             case "ChoosePlayer5":
-                currentDelver.targets.Add(delver5);
+                currentDelver.target = delver5;
                 break;
             case "ChoosePlayer6":
-                currentDelver.targets.Add(delver6);
+                currentDelver.target = delver6;
                 break;
             case "ChoosePlayer7":
-                currentDelver.targets.Add(delver7);
+                currentDelver.target = delver7;
                 break;
             case "ChoosePlayer8":
-                currentDelver.targets.Add(delver8);
+                currentDelver.target = delver8;
                 break;
             default:
                 break;
@@ -295,8 +308,6 @@ public class ManagerScript : MonoBehaviour
         // resolve the scenario
         List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
         currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
-
-
 
         // determine if a winner exists
         int maxTreasures = 20;
@@ -311,6 +322,12 @@ public class ManagerScript : MonoBehaviour
                     triumphantDelver = delver;
                 }
             }
+        }
+
+        // clear all player choices
+        foreach(PlayerScript delver in delvers)
+        {
+            delver.ClearChoices();
         }
 
         // destroy existing hand's instantiated cards to make way for the next hand

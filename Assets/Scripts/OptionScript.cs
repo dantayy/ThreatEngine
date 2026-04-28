@@ -11,14 +11,12 @@ public class OptionScript : MonoBehaviour
 
     public TextMeshProUGUI titleElement;
     public TextMeshProUGUI effectElement;
-    public TextMeshProUGUI optionIDElement;
 
     // Awake is called before Start
     void Awake()
     {
         titleElement = transform.Find("OptionTitle").GetComponent<TextMeshProUGUI>();
         effectElement = transform.Find("OptionEffect").GetComponent<TextMeshProUGUI>();
-        optionIDElement = transform.Find("OptionID").GetComponent<TextMeshProUGUI>();
     }
 
     //Update UI elements and display the option
@@ -26,6 +24,5 @@ public class OptionScript : MonoBehaviour
     {
         titleElement.text = title;
         effectElement.text = effect;
-        optionIDElement.text = id;
     }
 }

@@ -18,26 +18,39 @@ public class PlayerScript : MonoBehaviour
     public PlayerScript leftDelver;
     // reference to next delver in turn order
     public PlayerScript rightDelver;
-    // target(s) delver picks when taking certain actions
-    public List<PlayerScript> targets;
+    // target delver picks when taking certain actions
+    public PlayerScript target;
+    // flag set when the delver runs out of time when making a choice
+    public bool choseRandomly = false;
 
-    private GameObject playerCanvas;
     public TextMeshProUGUI playerTitleText;
     public TextMeshProUGUI playerScoreText;
     public TextMeshProUGUI playerDebugText;
+    public GameObject playerInputIcons;
 
     // Awake is called before Start
     void Awake()
     {
-        playerCanvas = transform.Find("PlayerCanvas").gameObject;
-        playerTitleText = playerCanvas.transform.Find("PlayerTitleText").GetComponent<TextMeshProUGUI>();
-        playerScoreText = playerCanvas.transform.Find("PlayerScoreText").GetComponent<TextMeshProUGUI>();
-        playerDebugText = playerCanvas.transform.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
+        playerTitleText = transform.Find("PlayerTitleText").GetComponent<TextMeshProUGUI>();
+        playerScoreText = transform.Find("PlayerScoreText").GetComponent<TextMeshProUGUI>();
+        playerDebugText = transform.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
+        playerInputIcons = transform.Find("PlayerInputIcons").gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    // Reset all values related to choices a player makes during a round
+    public void ClearChoices()
+    {
+        actionIdx = -1;
+        target = null;
+        callToSpirit = false;
+        choseRandomly = false;
+        playerDebugText.text = string.Empty;
+        playerInputIcons.SetActive(false);
     }
 }
