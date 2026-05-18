@@ -14,6 +14,8 @@ public class Clocktower : ScenarioScript
 
         actionEffects.Add("+20 IF no one carries the spirit's favor. [+5]");
         actionEffects.Add("+ points equal to the sum of digits in the minute portion of the time when the player resolves their turn. [+1]");
+
+        lateGame = true;
     }
 
     protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
@@ -34,7 +36,7 @@ public class Clocktower : ScenarioScript
                 // knock the bell
                 case 0:
                     {
-                        // only need to check all delvers once
+                        // check all delvers once for favored status
                         if(!favoredChecked)
                         {
                             foreach (PlayerScript target in delversSortedScores)

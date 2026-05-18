@@ -1423,11 +1423,16 @@ MonoBehaviour:
   TimerText: {fileID: 25580792}
   playerTurnTime: 10
   discussionTime: 5
-  Scenarios:
+  scenarios:
   - {fileID: 11400000, guid: 14bc55d1e8714fa4ca4cfda8a938781a, type: 2}
-  - {fileID: 11400000, guid: 3dcf12672b9eaca4a9292b777f5175a2, type: 2}
-  - {fileID: 11400000, guid: 2944c597a27575d40af9e362c0802f8f, type: 2}
   - {fileID: 11400000, guid: a491eac9bde64bb4397e783eaa044108, type: 2}
+  - {fileID: 11400000, guid: 7bd2a3a3488272246b23886ce7f22b3c, type: 2}
+  - {fileID: 11400000, guid: a6d9e7e4a46d5814a8c2b3c34ccea662, type: 2}
+  - {fileID: 11400000, guid: 2944c597a27575d40af9e362c0802f8f, type: 2}
+  - {fileID: 11400000, guid: 3dcf12672b9eaca4a9292b777f5175a2, type: 2}
+  - {fileID: 11400000, guid: bbbe15c406edad545a43829add75adb2, type: 2}
+  - {fileID: 11400000, guid: 494e9763e9940854686c89cb9025d692, type: 2}
+  - {fileID: 11400000, guid: 9da35fc9a836a804d9111496afea0915, type: 2}
   optionDisplays:
   - {fileID: 2017141035}
   - {fileID: 2086075914}

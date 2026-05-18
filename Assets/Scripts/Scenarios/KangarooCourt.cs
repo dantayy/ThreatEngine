@@ -18,6 +18,8 @@ public class KangarooCourt : ScenarioScript
         actionEffects.Add("+5 for last place delver(s) [+3]");
         actionEffects.Add("-5 for first place delver(s) [+5]");
         actionEffects.Add("+3 to all delvers not in first or last place [Steal 3 from them instead]");
+
+        lateGame = true;
     }
 
     protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
@@ -83,6 +85,7 @@ public class KangarooCourt : ScenarioScript
                         }
                         break;
                     }
+                // destroy the scale
                 case 3:
                     {
                         // manipulate treasures of all delvers not in first or last place

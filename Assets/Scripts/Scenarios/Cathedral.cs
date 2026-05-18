@@ -15,6 +15,8 @@ public class Cathedral : ScenarioScript
         actionEffects.Add("+5 [+3] IF only you choose this");
         actionEffects.Add("+1 [+2]");
         actionEffects.Add("+4 [+2] IF everyone chooses this");
+
+        earlyGame = true;
     }
 
     protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)

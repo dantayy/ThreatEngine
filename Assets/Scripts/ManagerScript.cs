@@ -19,8 +19,6 @@ public class ManagerScript : MonoBehaviour
     [SerializeField] public Button StartButton;
     [SerializeField] public TextMeshProUGUI GuideText;
     [SerializeField] public TextMeshProUGUI TimerText;
-    // NOTE: put these gameobjects in this list in the same order as the playerscripts they are representing!
-
 
     // timer-related fields
     [SerializeField] public float playerTurnTime; // time to choose an option for a player
@@ -29,9 +27,18 @@ public class ManagerScript : MonoBehaviour
     bool discussionFlag = false;
     bool delverTurnFlag = false;
 
-    // one scenario is randomly selected each round
-    [SerializeField] public List<ScenarioScript> Scenarios;
+    // turn counter
+    int turnCount = 1;
+
+    // scenario pool variables
+    [SerializeField] public List<ScenarioScript> scenarios;
+
+    List<ScenarioScript> earlyScenarios = new List<ScenarioScript>();
+    List<ScenarioScript> midScenarios = new List<ScenarioScript>();
+    List<ScenarioScript> lateScenarios = new List<ScenarioScript>();
     ScenarioScript currentScenario;
+    ScenarioScript prevScenario;
+    int scenarioIdx = 0;
     int currentScenarioOptionCount = 0;
 
     // UI elements for displaying scenario option details
@@ -98,6 +105,23 @@ public class ManagerScript : MonoBehaviour
         // pick a random delver to go first in the starting round
         // TODO: let players choose this by vote instead?
         firstDelver = delvers[UnityEngine.Random.Range(0, delvers.Count())];
+
+        // fill the early, mid, and late game scenario lists
+        foreach(ScenarioScript scenario in scenarios)
+        {
+            if(scenario.earlyGame)
+            {
+                earlyScenarios.Add(scenario);
+            }
+            else if(scenario.lateGame)
+            {
+                lateScenarios.Add(scenario);
+            }
+            else
+            {
+                midScenarios.Add(scenario);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -138,8 +162,11 @@ public class ManagerScript : MonoBehaviour
         GuideText.text = "Starting...";
         GuideText.enabled = true;
 
+        // reset turn counter
+        turnCount = 1;
+
         // no scenarios to pull from, abort
-        if(Scenarios.Count == 0)
+        if(scenarios.Count == 0)
         {
             Debug.Log("No scenarios available! Aborting!!!");
             Application.Quit();
@@ -153,8 +180,73 @@ public class ManagerScript : MonoBehaviour
     // select a scenario and display its options for players to choose
     void SetUpScenario()
     {
-        // select a random scenario from the list
-        currentScenario = Scenarios[UnityEngine.Random.Range(0, Scenarios.Count)];
+        // store previous scenario for comparison
+        if(turnCount > 1)
+        {
+            prevScenario = currentScenario;
+        }
+        // handle case of tesseract scenario bringing back the previous scenario
+        if(currentScenario is Tesseract)
+        {
+            currentScenario = ((Tesseract)currentScenario).prev;
+        }
+        // pick new scenario randomly
+        else
+        {
+            // pick from a different pool of scenarios depending on how far into the game we are
+            // early game
+            if(turnCount == 1)
+            {
+                // edge case of all early game scenarios being played (impossible if at least one early game scenario is in the general pool)
+                if(earlyScenarios.Count == 0)
+                {
+                    currentScenario = scenarios[UnityEngine.Random.Range(0, scenarios.Count)];
+                }
+                else
+                {
+                    scenarioIdx = UnityEngine.Random.Range(0, earlyScenarios.Count);
+                    currentScenario = earlyScenarios[scenarioIdx];
+                    earlyScenarios.RemoveAt(scenarioIdx);
+                }
+            }
+            // mid game
+            else if(turnCount < 5)
+            {
+                // edge case of all mid game scenarios being played
+                if(midScenarios.Count == 0)
+                {
+                    currentScenario = scenarios[UnityEngine.Random.Range(0, scenarios.Count)];
+                }
+                else
+                {
+                    scenarioIdx = UnityEngine.Random.Range(0, midScenarios.Count);
+                    currentScenario = midScenarios[scenarioIdx];
+                    midScenarios.RemoveAt(scenarioIdx);
+                }
+            }
+            // late game
+            else
+            {
+                // edge case of all late game scenarios being played
+                if(lateScenarios.Count == 0)
+                {
+                    currentScenario = scenarios[UnityEngine.Random.Range(0, scenarios.Count)];
+                }
+                else
+                {
+                    scenarioIdx = UnityEngine.Random.Range(0, lateScenarios.Count);
+                    currentScenario = lateScenarios[scenarioIdx];
+                    lateScenarios.RemoveAt(scenarioIdx);
+                }
+            }
+        }
+
+        // store previous scenario in the tesseract if we pull that scenario for this round
+        if(currentScenario is Tesseract)
+        {
+            ((Tesseract)currentScenario).prev = prevScenario;
+        }
+
         currentScenarioOptionCount = currentScenario.actionTitles.Count;
 
         // fill the option prefabs with this scenario's information
@@ -336,12 +428,15 @@ public class ManagerScript : MonoBehaviour
             Destroy(card.gameObject);
         }
 
+        // end game
         if(triumphantDelver)
         {
             Debug.Log(triumphantDelver.name +  " has won the game!");
         }
+        // start next round
         else
         {
+            turnCount++;
             SetUpScenario();
         }
     }

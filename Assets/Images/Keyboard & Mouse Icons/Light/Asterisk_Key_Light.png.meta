@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Asterisk_Key_Light_0: 1731455768464750549
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

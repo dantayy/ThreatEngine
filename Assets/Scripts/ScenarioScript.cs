@@ -12,6 +12,9 @@ public abstract class ScenarioScript : ScriptableObject
     // mechanical descriptions of the outcomes of the actions being selected
     // TODO: use something other than the string type so we can write with more than plaintext
     [System.NonSerialized] public List<string> actionEffects = new List<string>();
+    // flags set to consider a scenario as either early-game or late-game
+    [field: SerializeField] public bool earlyGame = false;
+    [field: SerializeField] public bool lateGame = false;
 
     // resolve scenario
     public void ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)
