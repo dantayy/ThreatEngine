@@ -65,6 +65,9 @@ public class ManagerScript : MonoBehaviour
     bool currentDelverSet = false;
     PlayerScript currentDelver;
 
+    // game state history
+    List<GameStateScript> gameStateHistory;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -401,11 +404,24 @@ public class ManagerScript : MonoBehaviour
         List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
         currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
 
+        // set up game state record
+        GameStateScript state = new GameStateScript();
+        state.scenario = currentScenario;
+
         // determine if a winner exists
         int maxTreasures = 20;
         PlayerScript triumphantDelver = null;
         foreach(PlayerScript delver in delvers)
         {
+            // set up game state for this delver to be recorded
+            state.delverChoices[delver] = delver.actionIdx;
+            state.delverScores[delver] = delver.treasures;
+            state.delverTargets[delver] = delver.target;
+            state.spiritCalled[delver] = delver.callToSpirit;
+            if(delver.favored)
+            {
+                state.spiritFavoredID = delver.delverID;
+            }
             if(delver.treasures >= maxTreasures)
             {
                 maxTreasures = delver.treasures;
@@ -415,6 +431,9 @@ public class ManagerScript : MonoBehaviour
                 }
             }
         }
+
+        // push game state to history
+        gameStateHistory.Add(state);
 
         // clear all player choices
         foreach(PlayerScript delver in delvers)
