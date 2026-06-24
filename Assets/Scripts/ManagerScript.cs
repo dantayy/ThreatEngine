@@ -37,7 +37,6 @@ public class ManagerScript : MonoBehaviour
     List<ScenarioScript> midScenarios = new List<ScenarioScript>();
     List<ScenarioScript> lateScenarios = new List<ScenarioScript>();
     ScenarioScript currentScenario;
-    ScenarioScript prevScenario;
     int scenarioIdx = 0;
     int currentScenarioOptionCount = 0;
 
@@ -168,6 +167,9 @@ public class ManagerScript : MonoBehaviour
         // reset turn counter
         turnCount = 1;
 
+        // reset game state history
+        gameStateHistory.Clear();
+
         // no scenarios to pull from, abort
         if(scenarios.Count == 0)
         {
@@ -183,15 +185,10 @@ public class ManagerScript : MonoBehaviour
     // select a scenario and display its options for players to choose
     void SetUpScenario()
     {
-        // store previous scenario for comparison
-        if(turnCount > 1)
-        {
-            prevScenario = currentScenario;
-        }
         // handle case of tesseract scenario bringing back the previous scenario
-        if(currentScenario is Tesseract)
+        if(gameStateHistory[gameStateHistory.Count - 1].scenario is Tesseract)
         {
-            currentScenario = ((Tesseract)currentScenario).prev;
+            currentScenario = gameStateHistory[gameStateHistory.Count - 2].scenario;
         }
         // pick new scenario randomly
         else
@@ -242,12 +239,6 @@ public class ManagerScript : MonoBehaviour
                     lateScenarios.RemoveAt(scenarioIdx);
                 }
             }
-        }
-
-        // store previous scenario in the tesseract if we pull that scenario for this round
-        if(currentScenario is Tesseract)
-        {
-            ((Tesseract)currentScenario).prev = prevScenario;
         }
 
         currentScenarioOptionCount = currentScenario.actionTitles.Count;
@@ -408,7 +399,7 @@ public class ManagerScript : MonoBehaviour
         GameStateScript state = new GameStateScript();
         state.scenario = currentScenario;
 
-        // determine if a winner exists
+        // determine if a winner exists and update the game state history
         int maxTreasures = 20;
         PlayerScript triumphantDelver = null;
         foreach(PlayerScript delver in delvers)
@@ -450,6 +441,7 @@ public class ManagerScript : MonoBehaviour
         // end game
         if(triumphantDelver)
         {
+            // TODO: save game state history?
             Debug.Log(triumphantDelver.name +  " has won the game!");
         }
         // start next round
