@@ -124,6 +124,9 @@ public class ManagerScript : MonoBehaviour
                 midScenarios.Add(scenario);
             }
         }
+
+        // instantiate history
+        gameStateHistory = new List<GameStateScript>();
     }
 
     // Update is called once per frame
@@ -186,7 +189,7 @@ public class ManagerScript : MonoBehaviour
     void SetUpScenario()
     {
         // handle case of tesseract scenario bringing back the previous scenario
-        if(gameStateHistory[gameStateHistory.Count - 1].scenario is Tesseract)
+        if(gameStateHistory.Count > 1 && gameStateHistory[gameStateHistory.Count - 1].scenario is Tesseract)
         {
             currentScenario = gameStateHistory[gameStateHistory.Count - 2].scenario;
         }
@@ -396,8 +399,7 @@ public class ManagerScript : MonoBehaviour
         currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
 
         // set up game state record
-        GameStateScript state = new GameStateScript();
-        state.scenario = currentScenario;
+        GameStateScript state = new GameStateScript(currentScenario);
 
         // determine if a winner exists and update the game state history
         int maxTreasures = 20;
@@ -405,10 +407,10 @@ public class ManagerScript : MonoBehaviour
         foreach(PlayerScript delver in delvers)
         {
             // set up game state for this delver to be recorded
-            state.delverChoices[delver] = delver.actionIdx;
-            state.delverScores[delver] = delver.treasures;
-            state.delverTargets[delver] = delver.target;
-            state.spiritCalled[delver] = delver.callToSpirit;
+            state.delverChoices.Add(delver,delver.actionIdx);
+            state.delverScores.Add(delver,delver.treasures);
+            state.delverTargets.Add(delver,delver.target);
+            state.spiritCalled.Add(delver,delver.callToSpirit);
             if(delver.favored)
             {
                 state.spiritFavoredID = delver.delverID;
@@ -443,6 +445,21 @@ public class ManagerScript : MonoBehaviour
         {
             // TODO: save game state history?
             Debug.Log(triumphantDelver.name +  " has won the game!");
+            for(int turn = 0; turn < gameStateHistory.Count; turn++)
+            {
+                Debug.Log("Turn " + turn);
+                Debug.Log("Scenario: " + gameStateHistory[turn].scenario.scenarioTitle);
+                Debug.Log("Favored Delver: " + gameStateHistory[turn].spiritFavoredID);
+                foreach(PlayerScript delver in delvers)
+                {
+                    Debug.Log("Delver " + delver.delverID + " - ");
+                    Debug.Log("Spirit Called: " + gameStateHistory[turn].spiritCalled[delver]);
+                    Debug.Log("Action: " + gameStateHistory[turn].scenario.actionTitles[gameStateHistory[turn].delverChoices[delver]]);
+                    Debug.Log("Description: " + gameStateHistory[turn].scenario.actionEffects[gameStateHistory[turn].delverChoices[delver]]);
+                    Debug.Log("Treasures: " + gameStateHistory[turn].delverScores[delver]);
+                    Debug.Log("Target: " + gameStateHistory[turn].delverTargets[delver]);
+                }
+            }
         }
         // start next round
         else
