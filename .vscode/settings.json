@@ -56,5 +56,8 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "ThreatEngine.sln"
+    "dotnet.defaultSolution": "ThreatEngine.slnx",
+    "cSpell.words": [
+        "Behaviour"
+    ]
 }
