@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Hive", menuName = "Scriptable Objects/Hive")]
@@ -17,7 +18,7 @@ public class Hive : ScenarioScript
         actionEffects.Add("+2 IF A AND B are also picked [+1]");
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // vars for tracking how many delvers went each way
         int leftCount = 0;
@@ -54,12 +55,12 @@ public class Hive : ScenarioScript
                         // give treasures if others went down the other paths
                         if(middleCount > 0 && rightCount > 0)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 2);
                         }
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 1);
+                            await TreasureAdjustment(currentDelver, 1);
                         }
                         break;
                     }
@@ -69,12 +70,12 @@ public class Hive : ScenarioScript
                         // give treasures if others went down the other paths
                         if(leftCount > 0 && rightCount > 0)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 2);
                         }
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 1);
+                            await TreasureAdjustment(currentDelver, 1);
                         }
                         break;
                     }
@@ -84,12 +85,12 @@ public class Hive : ScenarioScript
                         // give treasures if others went down the other paths
                         if(leftCount > 0 && middleCount > 0)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 2);
                         }
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 1);
+                            await TreasureAdjustment(currentDelver, 1);
                         }
                         break;
                     }

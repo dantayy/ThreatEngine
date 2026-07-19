@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Clocktower", menuName = "Scriptable Objects/Clocktower")]
@@ -18,7 +19,7 @@ public class Clocktower : ScenarioScript
         lateGame = true;
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // flag set when any delver is favored this round
         bool favored = false;
@@ -53,12 +54,12 @@ public class Clocktower : ScenarioScript
                         // only give points if no delver is favored
                         if(!favored)
                         {
-                            TreasureAdjustment(currentDelver, 20);
+                            await TreasureAdjustment(currentDelver, 20);
                         }
                         // add extra treasures if favored
                         else if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 5);
+                            await TreasureAdjustment(currentDelver, 5);
                         }
                         break;
                     }
@@ -68,11 +69,11 @@ public class Clocktower : ScenarioScript
                         // grab current time
                         currentTime = DateTime.Now;
                         // calculate sum of digits in gear, then add to current delver's treasures
-                        TreasureAdjustment(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
+                        await TreasureAdjustment(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
                         // add extra treasures if favored
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 1);
+                            await TreasureAdjustment(currentDelver, 1);
                         }
                         break;
                     }

@@ -391,6 +391,52 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &364044454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 364044456}
+  - component: {fileID: 364044455}
+  m_Layer: 0
+  m_Name: AnimationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &364044455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364044454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6d0e2b846786634cb5a6c19caf771a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  treasurePrefab: {fileID: 3555401369029318624, guid: 8e1f6be8316b2f340bf3a8899408e7e9, type: 3}
+  GameCanvas: {fileID: 761839022}
+--- !u!4 &364044456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364044454}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &369313761
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1446,7 +1492,9 @@ MonoBehaviour:
   delver6: {fileID: 0}
   delver7: {fileID: 0}
   delver8: {fileID: 0}
+  delverIconPrefab: {fileID: 3555401369029318624, guid: 2cd9ce399105a004a8de0f833f88fa0f, type: 3}
   delvers: []
+  delverIcons: []
 --- !u!4 &1540712661
 Transform:
   m_ObjectHideFlags: 0
@@ -2263,3 +2311,4 @@ SceneRoots:
   - {fileID: 1734910892}
   - {fileID: 761839023}
   - {fileID: 1540712661}
+  - {fileID: 364044456}

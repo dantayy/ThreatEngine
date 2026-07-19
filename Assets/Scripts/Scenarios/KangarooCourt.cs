@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "KangarooCourt", menuName = "Scriptable Objects/KangarooCourt")]
@@ -22,7 +23,7 @@ public class KangarooCourt : ScenarioScript
         lateGame = true;
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // trackers for highest and lowest scores
         int highestTreasures = delversSortedScores.First().treasures;
@@ -38,7 +39,7 @@ public class KangarooCourt : ScenarioScript
                 case 0:
                     {
                         // remove from delver's treasures
-                        TreasureAdjustment(currentDelver, -3);
+                        await TreasureAdjustment(currentDelver, -3);
                         break;
                     }
                 // balance the scale
@@ -49,7 +50,7 @@ public class KangarooCourt : ScenarioScript
                         {
                             if(delversSortedScores[i].treasures == lowestTreasures)
                             {
-                                TreasureAdjustment(delversSortedScores[i], 5);
+                                await TreasureAdjustment(delversSortedScores[i], 5);
                             }
                             else
                             {
@@ -59,7 +60,7 @@ public class KangarooCourt : ScenarioScript
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 3);
+                            await TreasureAdjustment(currentDelver, 3);
                         }
                         break;
                     }
@@ -71,7 +72,7 @@ public class KangarooCourt : ScenarioScript
                         {
                             if(delversSortedScores[i].treasures == highestTreasures)
                             {
-                                TreasureAdjustment(delversSortedScores[i], -5);
+                                await TreasureAdjustment(delversSortedScores[i], -5);
                             }
                             else
                             {
@@ -81,7 +82,7 @@ public class KangarooCourt : ScenarioScript
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 5);
+                            await TreasureAdjustment(currentDelver, 5);
                         }
                         break;
                     }
@@ -96,13 +97,13 @@ public class KangarooCourt : ScenarioScript
                                 // steal from everyone in the middle when favored
                                 if(currentDelver.favored)
                                 {
-                                    TreasureAdjustment(delversSortedScores[i], -3);
-                                    TreasureAdjustment(currentDelver, 3);
+                                    await TreasureAdjustment(delversSortedScores[i], -3);
+                                    await TreasureAdjustment(currentDelver, 3);
                                 }
                                 // boost everyone in the middle
                                 else
                                 {
-                                    TreasureAdjustment(delversSortedScores[i], 3);
+                                    await TreasureAdjustment(delversSortedScores[i], 3);
                                 }
                             }
                         }

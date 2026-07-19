@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Tesseract", menuName = "Scriptable Objects/Tesseract")]
@@ -15,9 +16,9 @@ public class Tesseract : ScenarioScript
         lateGame = true;
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // nothing happens in the tesseract!
-        return;
+        await Task.CompletedTask;
     }
 }

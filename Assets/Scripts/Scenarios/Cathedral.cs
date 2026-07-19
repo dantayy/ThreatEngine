@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Cathedral", menuName = "Scriptable Objects/Cathedral")]
@@ -19,7 +20,7 @@ public class Cathedral : ScenarioScript
         earlyGame = true;
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // flag to unset when more than one delver takes the prayer action, nullifying treasures gained for all who picked it
         bool prayingAlone = true;
@@ -56,12 +57,12 @@ public class Cathedral : ScenarioScript
                         if(prayingAlone)
                         {
                             // add to delver's treasures
-                            TreasureAdjustment(currentDelver, 5);
+                            await TreasureAdjustment(currentDelver, 5);
                             // favored bonus
                             if (currentDelver.favored)
                             {
                                 // add to delver's treasures
-                                TreasureAdjustment(currentDelver, 3);
+                                await TreasureAdjustment(currentDelver, 3);
                             }
                         }
                         // can't be breaking the effigy together if someone is praying alone
@@ -72,11 +73,11 @@ public class Cathedral : ScenarioScript
                 case 1:
                     {
                         // add to delver's treasures
-                        TreasureAdjustment(currentDelver, 1);
+                        await TreasureAdjustment(currentDelver, 1);
                         // favored bonus
                         if (currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 2);
                         }
                         // can't be breaking the effigy together if someone is taking from the offering bin
                         breakCheck = true;
@@ -114,12 +115,12 @@ public class Cathedral : ScenarioScript
                         if(breakingTogether)
                         {
                             // add to delver's treasures
-                            TreasureAdjustment(currentDelver, 4);
+                            await TreasureAdjustment(currentDelver, 4);
                             // favored bonus
                             if (currentDelver.favored)
                             {
                                 // add to delver's treasures
-                                TreasureAdjustment(currentDelver, 2);
+                                await TreasureAdjustment(currentDelver, 2);
                             }
                         }
                         break;

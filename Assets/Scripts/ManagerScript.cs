@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
@@ -54,8 +55,12 @@ public class ManagerScript : MonoBehaviour
     [SerializeField] public PlayerScript delver7;
     [SerializeField] public PlayerScript delver8;
 
+    // player icon prefab
+    [SerializeField] public GameObject delverIconPrefab;
+
     // list of players
     public List<PlayerScript> delvers;
+    public List<GameObject> delverIcons;
 
     // delver going first in a round
     PlayerScript firstDelver;
@@ -66,6 +71,9 @@ public class ManagerScript : MonoBehaviour
 
     // game state history
     List<GameStateScript> gameStateHistory;
+
+    // events
+    public static event Func<ManagerScript, Task> OnRevealChoices;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -92,6 +100,11 @@ public class ManagerScript : MonoBehaviour
         {
             delvers[i].delverID = i + 1;
             delvers[i].playerTitleText.text = "Player " + delvers[i].delverID;
+
+            // create an icon used to represent the delver outside of their plaque
+            GameObject delverIcon = Instantiate(delverIconPrefab, GameCanvas.transform);
+            delverIcon.transform.Find("PlayerTitleText").GetComponent<TextMeshProUGUI>().text = "Player " + delvers[i].delverID;
+            delverIcons.Add(delverIcon);
 
             int rightDelverIdx = i + 1;
             int leftDelverIdx = i - 1;
@@ -392,11 +405,14 @@ public class ManagerScript : MonoBehaviour
     }
 
     // work to take players choices and resolve them here, updating threat status/health and point totals and bringing the game to its end state if necesary
-    void ResolveTurn()
+    async void ResolveTurn()
     {
+        // reveal the choices made to all players
+        await OnRevealChoices?.Invoke(this);
+
         // resolve the scenario
         List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
-        currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
+        await currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
 
         // set up game state record
         GameStateScript state = new GameStateScript(currentScenario);

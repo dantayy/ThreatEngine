@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SuspensionBridge", menuName = "Scriptable Objects/SuspensionBridge")]
@@ -17,7 +18,7 @@ public class SuspensionBridge : ScenarioScript
         earlyGame = true;
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // vars for tracking how many delvers went each way
         int leftCount = 0;
@@ -47,19 +48,19 @@ public class SuspensionBridge : ScenarioScript
                 case 0:
                     {
                         // treasures for every delver going on the other side
-                        TreasureAdjustment(currentDelver, rightCount);
+                        await TreasureAdjustment(currentDelver, rightCount);
                         // favored bonus
                         if(currentDelver.favored)
                         {
                             // extra bonus if everyone else went right
                             if(leftCount == 1)
                             {
-                                TreasureAdjustment(currentDelver, 4);
+                                await TreasureAdjustment(currentDelver, 4);
                             }
                             // default bonus
                             else
                             {
-                                TreasureAdjustment(currentDelver, 1);
+                                await TreasureAdjustment(currentDelver, 1);
                             }
                         }
                         break;
@@ -68,19 +69,19 @@ public class SuspensionBridge : ScenarioScript
                 case 1:
                     {
                         // treasures for every delver going on the other side
-                        TreasureAdjustment(currentDelver, leftCount);
+                        await TreasureAdjustment(currentDelver, leftCount);
                         // favored bonus
                         if(currentDelver.favored)
                         {
                             // extra bonus if everyone else went left
                             if(rightCount == 1)
                             {
-                                TreasureAdjustment(currentDelver, 4);
+                                await TreasureAdjustment(currentDelver, 4);
                             }
                             // default bonus
                             else
                             {
-                                TreasureAdjustment(currentDelver, 1);
+                                await TreasureAdjustment(currentDelver, 1);
                             }
                         }
                         break;

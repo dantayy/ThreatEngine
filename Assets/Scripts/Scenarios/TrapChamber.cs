@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TrapChamber", menuName = "Scriptable Objects/TrapChamber")]
@@ -16,7 +17,7 @@ public class TrapChamber : ScenarioScript
 
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // look at each delver's action choice
         PlayerScript currentDelver = firstDelver;
@@ -33,10 +34,10 @@ public class TrapChamber : ScenarioScript
                 // lose a finger
                 case 0:
                     {
-                        TreasureAdjustment(currentDelver, -1);
+                        await TreasureAdjustment(currentDelver, -1);
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 2);
                         }
                         if(!burnCheck)
                         {
@@ -64,19 +65,19 @@ public class TrapChamber : ScenarioScript
                         // more treasures if all delvers take on the fire together
                         if(burningTogether)
                         {
-                            TreasureAdjustment(currentDelver, 4);
+                            await TreasureAdjustment(currentDelver, 4);
                             if(currentDelver.favored)
                             {
-                                TreasureAdjustment(currentDelver, 6);
+                                await TreasureAdjustment(currentDelver, 6);
                             }
                         }
                         // negative treasures without unity
                         else
                         {
-                            TreasureAdjustment(currentDelver, -3);
+                            await TreasureAdjustment(currentDelver, -3);
                             if(currentDelver.favored)
                             {
-                                TreasureAdjustment(currentDelver, 1);
+                                await TreasureAdjustment(currentDelver, 1);
                             }
                         }
                         break;

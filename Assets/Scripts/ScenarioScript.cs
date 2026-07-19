@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 
 [CreateAssetMenu(fileName = "ScenarioScript", menuName = "Scriptable Objects/ScenarioScript")]
 public abstract class ScenarioScript : ScriptableObject
@@ -16,17 +19,21 @@ public abstract class ScenarioScript : ScriptableObject
     [field: SerializeField] public bool earlyGame = false;
     [field: SerializeField] public bool lateGame = false;
 
+    // events
+    public static event Func<PlayerScript, int, Task> OnTreasuresAdded;
+    public static event Func<PlayerScript, int, Task> OnTreasuresRemoved;
+
     // resolve scenario
-    public void ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)
+    public async Task ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)
     {
         Debug.Log("Resolving spirit calls");
-        SpiritCallingResolutions(delversSortedScores);
+        await SpiritCallingResolutions(delversSortedScores);
         Debug.Log("Resolving actions for " + name);
-        ActionResolutions(delversSortedScores, delverGoingFirst);
+        await ActionResolutions(delversSortedScores, delverGoingFirst);
     }
 
     // resolve delvers' spirit calling choices
-    void SpiritCallingResolutions(List<PlayerScript> delversSortedScores)
+    async Task SpiritCallingResolutions(List<PlayerScript> delversSortedScores)
     {
         // handle edge case of empty list of delvers being passed
         if(delversSortedScores.Count == 0)
@@ -83,7 +90,7 @@ public abstract class ScenarioScript : ScriptableObject
                         // non-favored delver misdirected by the spirit, loses a few treasures in the process
                         if (!caller.favored)
                         {
-                            TreasureAdjustment(caller, -2);
+                            await TreasureAdjustment(caller, -2);
                             break;
                         }
                     }
@@ -91,7 +98,7 @@ public abstract class ScenarioScript : ScriptableObject
                 // spirit overwhelmed by cacophany from within and without, abandoning favored and taking many treasures back with them
                 else
                 {
-                    TreasureAdjustment(currentlyFavored, -5);
+                    await TreasureAdjustment(currentlyFavored, -5);
                     currentlyFavored.favored = false;
                 }
             }
@@ -101,16 +108,16 @@ public abstract class ScenarioScript : ScriptableObject
                 // spirit loses connection with favored, takes a few treasures with them as they leave to spectate the rest of the competition
                 if (calledToSpirit.Count == 0)
                 {
-                    TreasureAdjustment(currentlyFavored, -2);
+                    await TreasureAdjustment(currentlyFavored, -2);
                     currentlyFavored.favored = false;
                 }
                 // spirit is swayed by a new singular voice, taking many treasures with them to their new favored
                 else if (calledToSpirit.Count == 1)
                 {
-                    TreasureAdjustment(currentlyFavored, -5);
+                    await TreasureAdjustment(currentlyFavored, -5);
                     currentlyFavored.favored = false;
 
-                    TreasureAdjustment(calledToSpirit[0], 5);
+                    await TreasureAdjustment(calledToSpirit[0], 5);
                     calledToSpirit[0].favored = true;
                 }
                 // spirit finds calm in mind of favored when confronted by cacophany of compeititors, causes offenders to lose a few treasures
@@ -118,7 +125,7 @@ public abstract class ScenarioScript : ScriptableObject
                 {
                     foreach (PlayerScript delver in calledToSpirit)
                     {
-                        TreasureAdjustment(delver, -2);
+                        await TreasureAdjustment(delver, -2);
                     }
                 }
             }
@@ -135,14 +142,14 @@ public abstract class ScenarioScript : ScriptableObject
             else if (calledToSpirit.Count == 1)
             {
                 calledToSpirit[0].favored = true;
-                TreasureAdjustment(calledToSpirit[0], 2);   
+                await TreasureAdjustment(calledToSpirit[0], 2);   
             }
             // too many voices call to spirit, causing them to misdirect all who participated and lose a few treasures in the process
             else
             {
                 foreach (PlayerScript caller in calledToSpirit)
                 {
-                    TreasureAdjustment(caller, -2);
+                    await TreasureAdjustment(caller, -2);
                 }
             }
         }
@@ -155,13 +162,19 @@ public abstract class ScenarioScript : ScriptableObject
     }
 
     // resolve players' action choices (implement in child scripts)
-    protected virtual void ActionResolutions(List<PlayerScript> delverSortedScores, PlayerScript delverGoingFirst) { }
+    protected virtual async Task ActionResolutions(List<PlayerScript> delverSortedScores, PlayerScript delverGoingFirst)
+    {
+        await Task.CompletedTask;
+    }
 
-    protected void TreasureAdjustment(PlayerScript delver, int treasureDelta)
+    protected async Task TreasureAdjustment(PlayerScript delver, int treasureDelta)
     {
         // log change for debugging (WILL slow things down if left on in release)
         Debug.Log("Delver with ID " + delver.delverID + " gets " + treasureDelta + " treasures.");
+
+        if(treasureDelta > 0) { await OnTreasuresAdded?.Invoke(delver, treasureDelta); }
+        else if(treasureDelta < 0) { await OnTreasuresRemoved?.Invoke(delver, treasureDelta); }
+
         delver.treasures += treasureDelta;
-        delver.playerScoreText.text = delver.treasures.ToString();
     }
 }

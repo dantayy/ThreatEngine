@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "HallOfMirrors", menuName = "Scriptable Objects/HallOfMirrors")]
@@ -21,7 +22,7 @@ public class HallOfMirrors : ScenarioScript
         earlyGame = true;
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
     {
         // vars for tracking how many delvers went each way
         int a = 0;
@@ -63,12 +64,12 @@ public class HallOfMirrors : ScenarioScript
                         // give treasures if exclusive
                         if(a == 1)
                         {
-                            TreasureAdjustment(currentDelver, 1);
+                            await TreasureAdjustment(currentDelver, 1);
                         }
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 3);
+                            await TreasureAdjustment(currentDelver, 3);
                         }
                         break;
                     }
@@ -78,12 +79,12 @@ public class HallOfMirrors : ScenarioScript
                         // give treasures if exclusive
                         if(b == 1)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 2);
                         }
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 2);
                         }
                         break;
                     }
@@ -93,12 +94,12 @@ public class HallOfMirrors : ScenarioScript
                         // give treasures if exclusive
                         if(c == 1)
                         {
-                            TreasureAdjustment(currentDelver, 3);
+                            await TreasureAdjustment(currentDelver, 3);
                         }
                         // favored bonus
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 1);
+                            await TreasureAdjustment(currentDelver, 1);
                         }
                         break;
                     }
@@ -108,7 +109,7 @@ public class HallOfMirrors : ScenarioScript
                         // give treasures if exclusive
                         if(d == 1)
                         {
-                            TreasureAdjustment(currentDelver, 4);
+                            await TreasureAdjustment(currentDelver, 4);
                         }
                         break;
                     }
