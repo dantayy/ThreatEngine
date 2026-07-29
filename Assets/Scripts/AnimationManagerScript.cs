@@ -37,6 +37,14 @@ public class AnimationManagerScript : MonoBehaviour
         ScenarioScript.OnTreasuresRemoved -= RemoveTreasures;
     }
 
+    // Center players who are interacting with the spirit
+    private async Task RevealSpiritCallings(ManagerScript gameManager)
+    {
+        List<PlayerScript> delvers = gameManager.delvers;
+        List<GameObject> delverIcons = gameManager.delverIcons;
+        
+    }
+
     // Place player icons next to the choices they made.
     private async Task RevealPlayerChoices(ManagerScript gameManager)
     {
