@@ -74,6 +74,7 @@ public class ManagerScript : MonoBehaviour
 
     // events
     public static event Func<ManagerScript, Task> OnRevealChoices;
+    public static event Func<ManagerScript, List<PlayerScript>, Task> OnActionResolutionCompleted;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -413,6 +414,8 @@ public class ManagerScript : MonoBehaviour
         // resolve the scenario
         List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
         await currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
+        await OnActionResolutionCompleted?.Invoke(this, delversSortedByTreasures);
+
 
         // set up game state record
         GameStateScript state = new GameStateScript(currentScenario);

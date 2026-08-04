@@ -22,6 +22,7 @@ public abstract class ScenarioScript : ScriptableObject
     // events
     public static event Func<PlayerScript, int, Task> OnTreasuresAdded;
     public static event Func<PlayerScript, int, Task> OnTreasuresRemoved;
+    public static event Func<List<PlayerScript>, PlayerScript, Task> OnActionResolutionBegan;
 
     // resolve scenario
     public async Task ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)
@@ -176,5 +177,12 @@ public abstract class ScenarioScript : ScriptableObject
         else if(treasureDelta < 0) { await OnTreasuresRemoved?.Invoke(delver, treasureDelta); }
 
         delver.treasures += treasureDelta;
+    }
+
+    // Trigger the animation event for the beginning of a player's action resolution.
+    protected async Task ActionResolutionBegan(List<PlayerScript> delvers, PlayerScript currentDelver)
+    {
+        // Thread-safe invocation using the null-conditional operator
+        await OnActionResolutionBegan?.Invoke(delvers, currentDelver);
     }
 }

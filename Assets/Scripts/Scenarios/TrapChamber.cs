@@ -28,6 +28,7 @@ public class TrapChamber : ScenarioScript
 
         do
         {
+            await ActionResolutionBegan(delversSortedScores, currentDelver);
             // handle each possible action choice
             switch (currentDelver.actionIdx)
             {

@@ -718,6 +718,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7777327033250758360}
   - component: {fileID: 7706669879929490359}
+  - component: {fileID: 5992199623494963062}
   m_Layer: 5
   m_Name: OptionPrefab
   m_TagString: Untagged
@@ -768,3 +769,15 @@ MonoBehaviour:
   id: 
   titleElement: {fileID: 0}
   effectElement: {fileID: 0}
+--- !u!225 &5992199623494963062
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8713177951049756595}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
