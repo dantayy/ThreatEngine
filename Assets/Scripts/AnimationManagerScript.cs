@@ -9,12 +9,16 @@ public class AnimationManagerScript : MonoBehaviour
 {
     // Visual depiction of a treasure.
     [SerializeField] GameObject treasurePrefab;
+    // Visual depiction of the spirit
+    [SerializeField] GameObject spiritPrefab;
+    // canvas game is rendered on
     [SerializeField] Canvas GameCanvas;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        // create spirit prefab
+        Instantiate(spiritPrefab);
     }
 
     // Update is called once per frame
@@ -42,7 +46,15 @@ public class AnimationManagerScript : MonoBehaviour
     {
         List<PlayerScript> delvers = gameManager.delvers;
         List<GameObject> delverIcons = gameManager.delverIcons;
-        
+
+        List<Task> callingTasks = new List<Task>();
+        foreach(PlayerScript delver in delvers)
+        {
+            int iconId = delver.delverID - 1;
+            GameObject currentPlayerIcon = delverIcons[iconId];
+        }
+
+        await Task.WhenAll(callingTasks);
     }
 
     // Place player icons next to the choices they made.

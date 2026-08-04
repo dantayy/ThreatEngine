@@ -421,6 +421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   treasurePrefab: {fileID: 3555401369029318624, guid: 8e1f6be8316b2f340bf3a8899408e7e9, type: 3}
+  spiritPrefab: {fileID: 3555401369029318624, guid: 3bee25d42d8cf3a4a82be0d86958694f, type: 3}
   GameCanvas: {fileID: 761839022}
 --- !u!4 &364044456
 Transform:
@@ -663,7 +664,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.4745098, g: 0.2626018, b: 0.19215688, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
