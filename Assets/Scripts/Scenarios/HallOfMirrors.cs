@@ -22,106 +22,74 @@ public class HallOfMirrors : ScenarioScript
         earlyGame = true;
     }
 
-    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
-        // vars for tracking how many delvers went each way
-        int a = 0;
-        int b = 0;
-        int c = 0;
-        int d = 0;
-
-        // perform initial pass of delver choices to determine how many went left and how many went right
-        foreach(PlayerScript delver in delversSortedScores)
+        // handle each possible action choice
+        switch (currentDelver.actionIdx)
         {
-            if(delver.actionIdx == 0)
-            {
-                a++;
-            }
-            else if(delver.actionIdx == 1)
-            {
-                b++;
-            }
-            else if(delver.actionIdx == 2)
-            {
-                c++;
-            }
-            else if(delver.actionIdx == 3)
-            {
-                d++;
-            }
+            // listen for the spirit's guidance
+            case 0:
+                {
+                    // give treasures if exclusive
+                    if(aCount == 1)
+                    {
+                        await TreasureAdjustment(currentDelver, 1);
+                    }
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        await TreasureAdjustment(currentDelver, 3);
+                    }
+                    break;
+                }
+            // take your time
+            case 1:
+                {
+                    // give treasures if exclusive
+                    if(bCount == 1)
+                    {
+                        await TreasureAdjustment(currentDelver, 2);
+                    }
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        await TreasureAdjustment(currentDelver, 2);
+                    }
+                    break;
+                }
+            // look for a trail to follow
+            case 2:
+                {
+                    // give treasures if exclusive
+                    if(cCount == 1)
+                    {
+                        await TreasureAdjustment(currentDelver, 3);
+                    }
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        await TreasureAdjustment(currentDelver, 1);
+                    }
+                    break;
+                }
+            // cannonball run
+            case 3:
+                {
+                    // give treasures if exclusive
+                    if(dCount == 1)
+                    {
+                        await TreasureAdjustment(currentDelver, 4);
+                    }
+                    break;
+                }
+            default:
+                break;
         }
 
-        // look at each delver's action choice
-        PlayerScript currentDelver = firstDelver;
-        do
-        {
-            // handle each possible action choice
-            switch (currentDelver.actionIdx)
-            {
-                // listen for the spirit's guidance
-                case 0:
-                    {
-                        // give treasures if exclusive
-                        if(a == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 1);
-                        }
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 3);
-                        }
-                        break;
-                    }
-                // take your time
-                case 1:
-                    {
-                        // give treasures if exclusive
-                        if(b == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 2);
-                        }
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 2);
-                        }
-                        break;
-                    }
-                // look for a trail to follow
-                case 2:
-                    {
-                        // give treasures if exclusive
-                        if(c == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 3);
-                        }
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 1);
-                        }
-                        break;
-                    }
-                // cannonball run
-                case 3:
-                    {
-                        // give treasures if exclusive
-                        if(d == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 4);
-                        }
-                        break;
-                    }
-                default:
-                    break;
-            }
+        // re-sort delver scores list
+        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
 
-            // re-sort delver scores list
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-            // move to next delver in turn order
-            currentDelver = currentDelver.rightDelver;
-        } while (currentDelver != firstDelver);
+        // move to next delver in turn order
+        currentDelver = currentDelver.rightDelver;
     }
 }

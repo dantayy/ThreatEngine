@@ -16,7 +16,7 @@ public class Tesseract : ScenarioScript
         lateGame = true;
     }
 
-    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
         // nothing happens in the tesseract!
         await Task.CompletedTask;

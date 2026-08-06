@@ -18,83 +18,61 @@ public class SuspensionBridge : ScenarioScript
         earlyGame = true;
     }
 
-    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
-        // vars for tracking how many delvers went each way
-        int leftCount = 0;
-        int rightCount = 0;
-
-        // perform initial pass of delver choices to determine how many went left and how many went right
-        foreach(PlayerScript delver in delversSortedScores)
+        // handle each possible action choice
+        switch (currentDelver.actionIdx)
         {
-            if(delver.actionIdx == 0)
-            {
-                leftCount++;
-            }
-            else if(delver.actionIdx == 1)
-            {
-                rightCount++;
-            }
+            // walk on the left
+            case 0:
+                {
+                    // treasures for every delver going on the other side
+                    await TreasureAdjustment(currentDelver, bCount);
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        // extra bonus if everyone else went right
+                        if(aCount == 1)
+                        {
+                            await TreasureAdjustment(currentDelver, 4);
+                        }
+                        // default bonus
+                        else
+                        {
+                            await TreasureAdjustment(currentDelver, 1);
+                        }
+                    }
+                    break;
+                }
+            // walk on the right
+            case 1:
+                {
+                    // treasures for every delver going on the other side
+                    await TreasureAdjustment(currentDelver, aCount);
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        // extra bonus if everyone else went left
+                        if(bCount == 1)
+                        {
+                            await TreasureAdjustment(currentDelver, 4);
+                        }
+                        // default bonus
+                        else
+                        {
+                            await TreasureAdjustment(currentDelver, 1);
+                        }
+                    }
+                    break;
+                }
+            default:
+                break;
         }
 
-        // look at each delver's action choice
-        PlayerScript currentDelver = firstDelver;
-        do
-        {
-            // handle each possible action choice
-            switch (currentDelver.actionIdx)
-            {
-                // walk on the left
-                case 0:
-                    {
-                        // treasures for every delver going on the other side
-                        await TreasureAdjustment(currentDelver, rightCount);
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            // extra bonus if everyone else went right
-                            if(leftCount == 1)
-                            {
-                                await TreasureAdjustment(currentDelver, 4);
-                            }
-                            // default bonus
-                            else
-                            {
-                                await TreasureAdjustment(currentDelver, 1);
-                            }
-                        }
-                        break;
-                    }
-                // walk on the right
-                case 1:
-                    {
-                        // treasures for every delver going on the other side
-                        await TreasureAdjustment(currentDelver, leftCount);
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            // extra bonus if everyone else went left
-                            if(rightCount == 1)
-                            {
-                                await TreasureAdjustment(currentDelver, 4);
-                            }
-                            // default bonus
-                            else
-                            {
-                                await TreasureAdjustment(currentDelver, 1);
-                            }
-                        }
-                        break;
-                    }
-                default:
-                    break;
-            }
+        // re-sort delver scores list
+        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
 
-            // re-sort delver scores list
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-            // move to next delver in turn order
-            currentDelver = currentDelver.rightDelver;
-        } while (currentDelver != firstDelver);
+        // move to next delver in turn order
+        currentDelver = currentDelver.rightDelver;
     }
 }

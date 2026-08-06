@@ -24,13 +24,63 @@ public abstract class ScenarioScript : ScriptableObject
     public static event Func<PlayerScript, int, Task> OnTreasuresRemoved;
     public static event Func<List<PlayerScript>, PlayerScript, Task> OnActionResolutionBegan;
 
+    // delver having their scenario action resolved
+    protected PlayerScript currentDelver;
+    // count of each action being taken
+    protected int aCount = 0;
+    protected int bCount = 0;
+    protected int cCount = 0;
+    protected int dCount = 0;
+    // time for clocktower
+    protected DateTime currentTime;
+    // flag set when a delver is favored by the spirit
+    protected bool delverFavored;
+
     // resolve scenario
     public async Task ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)
     {
         Debug.Log("Resolving spirit calls");
         await SpiritCallingResolutions(delversSortedScores);
         Debug.Log("Resolving actions for " + name);
-        await ActionResolutions(delversSortedScores, delverGoingFirst);
+        // reset the main tracker vars
+        currentDelver = delverGoingFirst;
+        aCount = 0;
+        bCount = 0;
+        cCount = 0;
+        dCount = 0;
+        delverFavored = false;
+        // perform initial pass of delver choices to set trackers up
+        foreach(PlayerScript delver in delversSortedScores)
+        {
+            // set favored flag
+            if(delver.favored)
+            {
+                delverFavored = true;
+            }
+            // increment choice tracker
+            if(delver.actionIdx == 0)
+            {
+                aCount++;
+            }
+            else if(delver.actionIdx == 1)
+            {
+                bCount++;
+            }
+            else if(delver.actionIdx == 2)
+            {
+                cCount++;
+            }
+            else if(delver.actionIdx == 3)
+            {
+                dCount++;
+            }
+        }
+        // perform unique actions based on the child class' implementation until all delvers have had their actions resolved
+        do
+        {
+            await ActionResolutionBegan(delversSortedScores, currentDelver);
+            await ActionResolutions(delversSortedScores);
+        }while(currentDelver != delverGoingFirst);
     }
 
     // resolve delvers' spirit calling choices
@@ -163,7 +213,7 @@ public abstract class ScenarioScript : ScriptableObject
     }
 
     // resolve players' action choices (implement in child scripts)
-    protected virtual async Task ActionResolutions(List<PlayerScript> delverSortedScores, PlayerScript delverGoingFirst)
+    protected virtual async Task ActionResolutions(List<PlayerScript> delverSortedScores)
     {
         await Task.CompletedTask;
     }
