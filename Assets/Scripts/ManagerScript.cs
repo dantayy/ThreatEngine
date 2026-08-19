@@ -326,11 +326,29 @@ public class ManagerScript : MonoBehaviour
             // if any players didn't make choices in time, make a random choice for them and mark them to receive a penalty
             foreach(PlayerScript delver in delvers)
             {
-                int randomDelver = UnityEngine.Random.Range(0, currentScenarioOptionCount);
-                if (delver.actionIdx == -1) { delver.actionIdx = randomDelver; }
-                if(delver.target == null) { delver.target = delvers[UnityEngine.Random.Range(0, delvers.Count)]; }
-                delver.choseRandomly = true;
-                currentDelver.playerDebugText.text = "Chose Randomly (" + optionIDs[randomDelver] + ")";
+                int randomChoice = UnityEngine.Random.Range(0, currentScenarioOptionCount);
+                bool choseRandomly = false;
+
+                // choose a random option if necessary
+                if(delver.actionIdx == -1)
+                {
+                    delver.actionIdx = randomChoice;
+                    choseRandomly = true;
+                }
+
+                // choose a random target if necessary
+                if(delver.target == null)
+                {
+                    delver.target = delvers[UnityEngine.Random.Range(0, delvers.Count)];
+                    //Currently no penalty is incurred for not entering a target
+                }
+                
+                // store the fact that choices were made randomly for applying the penalty later
+                delver.choseRandomly = choseRandomly;
+                if(choseRandomly)
+                {
+                    delver.playerDebugText.text = "Chose Randomly (" + optionIDs[randomChoice] + ")";
+                }
             }
             GuideText.text = "Selections made! Resolving choices now...";
             ResolveTurn();
