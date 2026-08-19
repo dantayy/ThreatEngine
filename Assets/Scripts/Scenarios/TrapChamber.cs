@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TrapChamber", menuName = "Scriptable Objects/TrapChamber")]
@@ -16,80 +17,52 @@ public class TrapChamber : ScenarioScript
 
     }
 
-    protected override void ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
-        // look at each delver's action choice
-        PlayerScript currentDelver = firstDelver;
-
-        // flags for burning status
-        bool burningTogether = true;
-        bool burnCheck = false;
-
-        do
+        // handle each possible action choice
+        switch (currentDelver.actionIdx)
         {
-            // handle each possible action choice
-            switch (currentDelver.actionIdx)
-            {
-                // lose a finger
-                case 0:
+            // lose a finger
+            case 0:
+                {
+                    await TreasureAdjustment(currentDelver, -1);
+                    if(currentDelver.favored)
                     {
-                        TreasureAdjustment(currentDelver, -1);
+                        await TreasureAdjustment(currentDelver, 2);
+                    }
+                    break;
+                }
+            // burned alive
+            case 1:
+                {
+                    // more treasures if all delvers take on the fire together
+                    if(aCount == 0)
+                    {
+                        await TreasureAdjustment(currentDelver, 4);
                         if(currentDelver.favored)
                         {
-                            TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustment(currentDelver, 6);
                         }
-                        if(!burnCheck)
-                        {
-                            burnCheck = true;
-                            burningTogether = false;
-                        }
-                        break;
                     }
-                // burned alive
-                case 1:
+                    // negative treasures without unity
+                    else
                     {
-                        // check all delvers once to see if everyone is burning together
-                        if(!burnCheck)
+                        await TreasureAdjustment(currentDelver, -3);
+                        if(currentDelver.favored)
                         {
-                            foreach(PlayerScript delver in delversSortedScores)
-                            {
-                                if(delver.actionIdx != 1)
-                                {
-                                    burningTogether = false;
-                                    break;
-                                }
-                            }
-                            burnCheck = true;
+                            await TreasureAdjustment(currentDelver, 1);
                         }
-                        // more treasures if all delvers take on the fire together
-                        if(burningTogether)
-                        {
-                            TreasureAdjustment(currentDelver, 4);
-                            if(currentDelver.favored)
-                            {
-                                TreasureAdjustment(currentDelver, 6);
-                            }
-                        }
-                        // negative treasures without unity
-                        else
-                        {
-                            TreasureAdjustment(currentDelver, -3);
-                            if(currentDelver.favored)
-                            {
-                                TreasureAdjustment(currentDelver, 1);
-                            }
-                        }
-                        break;
                     }
-                default:
                     break;
-            }
+                }
+            default:
+                break;
+        }
 
-            // re-sort delver scores list
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
+        // re-sort delver scores list
+        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
 
-            // move to next delver in turn order
-            currentDelver = currentDelver.rightDelver;
-        } while (currentDelver != firstDelver);
+        // move to next delver in turn order
+        currentDelver = currentDelver.rightDelver;
     }
 }
