@@ -10,6 +10,7 @@ public struct GameStateScript
     public Dictionary<PlayerScript,int> delverChoices;
     public Dictionary<PlayerScript,PlayerScript> delverTargets;
     public Dictionary<PlayerScript,bool> spiritCalled;
+    public Dictionary<PlayerScript,int> delverBribes;
 
     public GameStateScript(ScenarioScript scen)
     {
@@ -19,5 +20,6 @@ public struct GameStateScript
         delverChoices = new Dictionary<PlayerScript, int>();
         delverTargets = new Dictionary<PlayerScript, PlayerScript>();
         spiritCalled = new Dictionary<PlayerScript, bool>();
+        delverBribes = new Dictionary<PlayerScript, int>();
     }
 }

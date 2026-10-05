@@ -10,6 +10,8 @@ public class PlayerScript : MonoBehaviour
     public int treasures = 0;
     // flag set when a delver calls to the spirit
     public bool callToSpirit = false;
+    // number of treasures being offered to the spirit
+    public int spiritBribe = 0;
     // flag set when the delver is favored by the spirit
     public bool favored = false;
     // action delver is choosing in a scenario
@@ -49,6 +51,7 @@ public class PlayerScript : MonoBehaviour
         actionIdx = -1;
         target = null;
         callToSpirit = false;
+        spiritBribe = 0;
         choseRandomly = false;
         playerDebugText.text = string.Empty;
         playerInputIcons.SetActive(false);

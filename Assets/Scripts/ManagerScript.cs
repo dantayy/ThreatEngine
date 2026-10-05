@@ -393,6 +393,10 @@ public class ManagerScript : MonoBehaviour
                 break;
             case "ThreatAction":
                 currentDelver.callToSpirit = true;
+                if(currentDelver.spiritBribe < currentDelver.treasures)
+                {
+                    currentDelver.spiritBribe++;
+                }
                 break;
             case "ChoosePlayer1":
                 currentDelver.target = delver1;
@@ -448,6 +452,7 @@ public class ManagerScript : MonoBehaviour
             state.delverScores.Add(delver,delver.treasures);
             state.delverTargets.Add(delver,delver.target);
             state.spiritCalled.Add(delver,delver.callToSpirit);
+            state.delverBribes.Add(delver, delver.spiritBribe);
             if(delver.favored)
             {
                 state.spiritFavoredID = delver.delverID;

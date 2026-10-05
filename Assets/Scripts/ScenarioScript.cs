@@ -96,8 +96,15 @@ public abstract class ScenarioScript : ScriptableObject
         bool spiritFavors = false;
         PlayerScript currentlyFavored = delversSortedScores[0];
 
-        // all delvers who called to spirit are held here
-        List<PlayerScript> calledToSpirit = new List<PlayerScript>();
+        // highest briber
+        PlayerScript highestBriber = delversSortedScores[0];
+        // highest bribe
+        int highestBribe = 0;
+        // flag to ensure no dupe highest bribe are accepted
+        bool uniqueHighest = true;
+        // bribe totals between favored and non-favored
+        int nonFavoredBribePool = 0;
+        int favoredBribeTotal = delversSortedScores.count - 1;
 
         // flag set by default to resort players based on score changes at the end
         // unset only in the rare case where no score changes occur
@@ -106,103 +113,85 @@ public abstract class ScenarioScript : ScriptableObject
         // loop through all players and check for calling status
         foreach (PlayerScript potentialCaller in delversSortedScores)
         {
-            // delver called to spirit
-            if (potentialCaller.callToSpirit)
+            // delver made a bid
+            if(potentialCaller.spiritBribe > 0)
             {
-                calledToSpirit.Add(potentialCaller);
-                // reset flag for next round
-                potentialCaller.callToSpirit = false;
-            }
-            // delver is currently favored
-            if (potentialCaller.favored)
-            {
-                currentlyFavored = potentialCaller;
-                spiritFavors = true;
+                // lose one treasure for offering anything
+                // TODO: should this score change happen later?
+                await TreasureAdjustment(potentialCaller, -1);
+                // existing favored bid
+                if(potentialCaller.favored)
+                {
+                    // favored exists this round
+                    spiritFavors = true;
+                    currentlyFavored = potentialCaller;
+                    // update favored bribe total
+                    favoredBribeTotal += potentialCaller.spiritBribe;
+                }
+                // non favored bid
+                else
+                {
+                    // add bribe to the pool against the favored
+                    nonFavoredBribePool += potentialCaller.spiritBribe;
+                    // check for new highest bidder
+                    if(potentialCaller.spiritBribe > highestBribe)
+                    {
+                        // update highest bidder
+                        highestBriber = potentialCaller;
+                        highestBribe = potentialCaller.spiritBribe;
+                        uniqueHighest = true;
+                    }
+                    // check for dupe highest bid
+                    else if(potentialCaller.spiritBribe == highestBribe)
+                    {
+                        uniqueHighest = false;
+                    }
+                }
             }
         }
 
-        // resolve calling effects
-        // delver currently favored
-        if (spiritFavors)
+        // if existing favored, compare their bribe to the unfavored pool
+        if(spiritFavors)
         {
-            // favored delver calling to the spirit themselves
-            if (calledToSpirit.Contains(currentlyFavored))
+            // non-favored beat the favored
+            if(nonFavoredBribePool > favoredBribeTotal)
             {
-                // communion from favored alone keeps the spirit attached
-                if (calledToSpirit.Count == 1)
+                // take favored away from the current favored
+                currentlyFavored.favored = false;
+                // favor is immediately transfered to highest bidder amongst formerly non-favored 
+                if(uniqueHighest)
+                {
+                    highestBriber.favored = true;
+                    await TreasureAdjustment(highestBriber, -(highestBriber.spiritBribe - 1));
+                }
+            }
+            // favored wins
+            else
+            {
+                // deduct anything else they offered to keep favor
+                if(currentlyFavored.spiritBribe > 0)
+                {
+                    await TreasureAdjustment(currentlyFavored, -(currentlyFavored.spiritBribe - 1));
+                }
+                // nobody bid anything, no score change occurs
+                else if(nonFavoredBribePool == 0)
                 {
                     scoreChange = false;
                 }
-                // one other delver called to the spirit
-                else if (calledToSpirit.Count == 2)
-                {
-                    foreach (PlayerScript caller in calledToSpirit)
-                    {
-                        // non-favored delver misdirected by the spirit, loses a few treasures in the process
-                        if (!caller.favored)
-                        {
-                            await TreasureAdjustment(caller, -2);
-                            break;
-                        }
-                    }
-                }
-                // spirit overwhelmed by cacophany from within and without, abandoning favored and taking many treasures back with them
-                else
-                {
-                    await TreasureAdjustment(currentlyFavored, -5);
-                    currentlyFavored.favored = false;
-                }
-            }
-            // favored delver remaining quiet
-            else
-            {
-                // spirit loses connection with favored, takes a few treasures with them as they leave to spectate the rest of the competition
-                if (calledToSpirit.Count == 0)
-                {
-                    await TreasureAdjustment(currentlyFavored, -2);
-                    currentlyFavored.favored = false;
-                }
-                // spirit is swayed by a new singular voice, taking many treasures with them to their new favored
-                else if (calledToSpirit.Count == 1)
-                {
-                    await TreasureAdjustment(currentlyFavored, -5);
-                    currentlyFavored.favored = false;
-
-                    await TreasureAdjustment(calledToSpirit[0], 5);
-                    calledToSpirit[0].favored = true;
-                }
-                // spirit finds calm in mind of favored when confronted by cacophany of compeititors, causes offenders to lose a few treasures
-                else
-                {
-                    foreach (PlayerScript delver in calledToSpirit)
-                    {
-                        await TreasureAdjustment(delver, -2);
-                    }
-                }
             }
         }
-        // no delver currently favored
-        else
+        // no one currently favored, just see if anyone has the highest bribe
+        else if(uniqueHighest && highestBribe > 0)
         {
-            // spirit remains in shadow, waiting for a greedy delver to commune with them
-            if (calledToSpirit.Count == 0)
-            {
-                scoreChange = false;
-            }
-            // one voice gains the spirit's favor and a gift of a few treasures
-            else if (calledToSpirit.Count == 1)
-            {
-                calledToSpirit[0].favored = true;
-                await TreasureAdjustment(calledToSpirit[0], 2);   
-            }
-            // too many voices call to spirit, causing them to misdirect all who participated and lose a few treasures in the process
-            else
-            {
-                foreach (PlayerScript caller in calledToSpirit)
-                {
-                    await TreasureAdjustment(caller, -2);
-                }
-            }
+            // set the flag
+            highestBriber.favored = true;
+            // remove the rest of their bribe on top of the one already paid in the main loop
+            await TreasureAdjustment(highestBriber, -(highestBriber.spiritBribe - 1));
+        }
+        // no one offered anything, no score changes occur
+        else if(highestBribe == 0)
+        {
+            scoreChange = false;
         }
 
         // re-sort delver score list to reflect the new scores if anything changed
