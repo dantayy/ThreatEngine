@@ -72,8 +72,5 @@ public class SuspensionBridge : ScenarioScript
             default:
                 break;
         }
-
-        // move to next delver in turn order
-        currentDelver = currentDelver.rightDelver;
     }
 }

@@ -32,7 +32,10 @@ public class KangarooCourt : ScenarioScript
             case 0:
                 {
                     // remove from delver's treasures
-                    await TreasureAdjustmentSingle(currentDelver, -3);
+                    if(!currentDelver.favored)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, -3);
+                    }
                     break;
                 }
             // balance the scale

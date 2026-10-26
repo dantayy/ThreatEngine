@@ -305,7 +305,7 @@ public class AnimationManagerScript : MonoBehaviour
 
                 Vector3[] travelPoints = new Vector3[]
                 {
-                    new Vector2((thievingDelver.transform.position.x + delver.transform.position.x) / 2, thievingDelver.transform.position.y + 200),
+                    new Vector2((thievingDelver.transform.position.x + delver.transform.position.x) / 2, thievingDelver.transform.position.y + 100),
                     new Vector2(thievingDelver.transform.position.x, thievingDelver.transform.position.y),
                 };
 

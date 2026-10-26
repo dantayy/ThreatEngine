@@ -74,11 +74,5 @@ public class Cathedral : ScenarioScript
             default:
                 break;
         }
-
-        // re-sort delver scores list
-        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-        // move to next delver in turn order
-        currentDelver = currentDelver.rightDelver;
     }
 }

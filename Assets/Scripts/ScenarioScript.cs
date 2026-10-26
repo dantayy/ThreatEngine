@@ -242,16 +242,26 @@ public abstract class ScenarioScript : ScriptableObject
         await Task.WhenAll(tasks);
     }
 
+    // Version of stealTreasures that takes in a single delver for convenience.
+    protected async Task StealTreasuresSingle(PlayerScript thievingDelver, PlayerScript targetDelver, int treasureDelta)
+    {
+        List<PlayerScript> delvers = new List<PlayerScript>() { targetDelver };
+        await StealTreasures(thievingDelver, delvers, treasureDelta);
+    }
+
     // Trigger the animation for a player stealing treasures from other players.
     protected async Task StealTreasures(PlayerScript thievingDelver, List<PlayerScript> affectedDelvers, int treasureDelta)
     {
         await ChangePlayerInvolvement(affectedDelvers, true);
         List<Task> tasks = new List<Task>();
+
+        Debug.Log("Treasures stolen: " + treasureDelta);
+        Debug.Log("Number of affected delvers: " + affectedDelvers.Count);
+        
+        await OnTreasuresStolen?.Invoke(thievingDelver, affectedDelvers, treasureDelta);
         
         foreach (PlayerScript delver in affectedDelvers) { delver.treasures -= treasureDelta; }
         thievingDelver.treasures += treasureDelta * affectedDelvers.Count;
-        
-        await OnTreasuresStolen?.Invoke(thievingDelver, affectedDelvers, treasureDelta);
     }
 
     // Trigger the animation event for the beginning of a player's action resolution.

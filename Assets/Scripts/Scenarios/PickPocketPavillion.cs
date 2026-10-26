@@ -39,15 +39,14 @@ public class PickPocketPavillion : ScenarioScript
             // hit and run
             case 1:
                 {
-                    // add to delver's treasures
-                    await TreasureAdjustmentSingle(currentDelver, 2);
-                    // take from target's treasures
-                    await TreasureAdjustmentSingle(currentDelver.target, -2);
+                    // steal treasures from target
+                    await StealTreasuresSingle(currentDelver, currentDelver.target, 2);
+
                     // favored bonus
                     if (currentDelver.favored)
                     {
-                        // add treasures for every other player
-                        await TreasureAdjustmentSingle(currentDelver, delversSortedScores.Count - 2);
+                        List<PlayerScript> affectedDelvers = new List<PlayerScript>();
+
                         // take from every other player
                         foreach (PlayerScript target in delversSortedScores)
                         {
@@ -56,9 +55,10 @@ public class PickPocketPavillion : ScenarioScript
                                 target.delverID != currentDelver.target.delverID
                             )
                             {
-                                await TreasureAdjustmentSingle(target, -1);
+                                affectedDelvers.Add(target);
                             }
                         }
+                        await StealTreasures(currentDelver, affectedDelvers, 1);
                     }
                     break;
                 }
@@ -83,11 +83,5 @@ public class PickPocketPavillion : ScenarioScript
             default:
                 break;
         }
-
-        // re-sort delver scores list
-        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-        // move to next delver in turn order
-        currentDelver = currentDelver.rightDelver;
     }
 }

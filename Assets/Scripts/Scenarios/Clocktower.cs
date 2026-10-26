@@ -44,7 +44,7 @@ public class Clocktower : ScenarioScript
                 {
                     // grab current time
                     currentTime = DateTime.Now;
-                    // calculate sum of digits in gear, then add to current delver's treasures
+                    // calculate sum of the two minute digits, then add to current delver's treasures
                     await TreasureAdjustmentSingle(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
                     // add extra treasures if favored
                     if(currentDelver.favored)
@@ -54,8 +54,5 @@ public class Clocktower : ScenarioScript
                     break;
                 }
         }
-
-        // move to next delver in turn order
-        currentDelver = currentDelver.rightDelver;
     }
 }
