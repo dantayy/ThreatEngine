@@ -32,28 +32,28 @@ public class KangarooCourt : ScenarioScript
             case 0:
                 {
                     // remove from delver's treasures
-                    await TreasureAdjustment(currentDelver, -3);
+                    await TreasureAdjustmentSingle(currentDelver, -3);
                     break;
                 }
             // balance the scale
             case 1:
                 {
                     // add treasures to last place delver(s)
+                    int lowestTreasureCount = delversSortedScores.Last().treasures;
+                    List<PlayerScript> affectedDelvers = new List<PlayerScript>();
                     for(int i = delversSortedScores.Count - 1; i >= 0; i--)
                     {
-                        if(delversSortedScores[i].treasures == delversSortedScores.Last().treasures)
+                        if(delversSortedScores[i].treasures == lowestTreasureCount)
                         {
-                            await TreasureAdjustment(delversSortedScores[i], 5);
-                        }
-                        else
-                        {
-                            break;
+                            affectedDelvers.Add(delversSortedScores[i]);
                         }
                     }
+                    await TreasureAdjustments(affectedDelvers, 5);
+
                     // favored bonus
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 3);
+                        await TreasureAdjustmentSingle(currentDelver, 3);
                     }
                     break;
                 }
@@ -61,55 +61,50 @@ public class KangarooCourt : ScenarioScript
             case 2:
                 {
                     // remove treasures from first place delver(s)
+                    int highestTreasureCount = delversSortedScores.First().treasures;
+                    List<PlayerScript> affectedDelvers = new List<PlayerScript>();
                     for(int i = 0; i < delversSortedScores.Count; i++)
                     {
-                        if(delversSortedScores[i].treasures == delversSortedScores.First().treasures)
+                        if(delversSortedScores[i].treasures == highestTreasureCount)
                         {
-                            await TreasureAdjustment(delversSortedScores[i], -5);
-                        }
-                        else
-                        {
-                            break;
+                            affectedDelvers.Add(delversSortedScores[i]);
                         }
                     }
+                    await TreasureAdjustments(affectedDelvers, -5);
+
                     // favored bonus
-                    if(currentDelver.favored)
+                    if (currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 5);
+                        await TreasureAdjustmentSingle(currentDelver, 5);
                     }
                     break;
                 }
             // destroy the scale
             case 3:
                 {
-                    // manipulate treasures of all delvers not in first or last place
+                    List<PlayerScript> affectedDelvers = new List<PlayerScript>();
                     for(int i = 1; i < delversSortedScores.Count - 1; i++)
                     {
-                        if(delversSortedScores[i].treasures != delversSortedScores.First().treasures && delversSortedScores[i].treasures != delversSortedScores.Last().treasures)
+                        int highestTreasureCount = delversSortedScores.First().treasures;
+                        int lowestTreasureCount = delversSortedScores.Last().treasures;
+
+                        // manipulate treasures of all delvers not in first or last place
+                        if (delversSortedScores[i].treasures != highestTreasureCount && delversSortedScores[i].treasures != lowestTreasureCount)
                         {
-                            // steal from everyone in the middle when favored
-                            if(currentDelver.favored)
-                            {
-                                await TreasureAdjustment(delversSortedScores[i], -3);
-                                await TreasureAdjustment(currentDelver, 3);
-                            }
-                            // boost everyone in the middle
-                            else
-                            {
-                                await TreasureAdjustment(delversSortedScores[i], 3);
-                            }
+                            affectedDelvers.Add(delversSortedScores[i]);
                         }
                     }
+
+                    if (currentDelver.favored)
+                    {
+                        await StealTreasures(currentDelver, affectedDelvers, 3);
+                        break;
+                    }
+                    await TreasureAdjustments(affectedDelvers, 3);
                     break;
                 }
             default:
                 break;
         }
-
-        // re-sort delver scores list
-        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-        // move to next delver in turn order
-        currentDelver = currentDelver.rightDelver;
     }
 }

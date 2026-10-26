@@ -27,19 +27,21 @@ public class SuspensionBridge : ScenarioScript
             case 0:
                 {
                     // treasures for every delver going on the other side
-                    await TreasureAdjustment(currentDelver, bCount);
+                    await TreasureAdjustmentSingle(currentDelver, bCount);
                     // favored bonus
                     if(currentDelver.favored)
                     {
                         // extra bonus if everyone else went right
                         if(aCount == 1)
                         {
-                            await TreasureAdjustment(currentDelver, 4);
+                            await ConditionResult(true);
+                            await TreasureAdjustmentSingle(currentDelver, 4);
                         }
                         // default bonus
                         else
                         {
-                            await TreasureAdjustment(currentDelver, 1);
+                            await ConditionResult(false);
+                            await TreasureAdjustmentSingle(currentDelver, 1);
                         }
                     }
                     break;
@@ -48,19 +50,21 @@ public class SuspensionBridge : ScenarioScript
             case 1:
                 {
                     // treasures for every delver going on the other side
-                    await TreasureAdjustment(currentDelver, aCount);
+                    await TreasureAdjustmentSingle(currentDelver, aCount);
                     // favored bonus
                     if(currentDelver.favored)
                     {
                         // extra bonus if everyone else went left
                         if(bCount == 1)
                         {
-                            await TreasureAdjustment(currentDelver, 4);
+                            await ConditionResult(true);
+                            await TreasureAdjustmentSingle(currentDelver, 4);
                         }
                         // default bonus
                         else
                         {
-                            await TreasureAdjustment(currentDelver, 1);
+                            await ConditionResult(false);
+                            await TreasureAdjustmentSingle(currentDelver, 1);
                         }
                     }
                     break;
@@ -68,9 +72,6 @@ public class SuspensionBridge : ScenarioScript
             default:
                 break;
         }
-
-        // re-sort delver scores list
-        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
 
         // move to next delver in turn order
         currentDelver = currentDelver.rightDelver;

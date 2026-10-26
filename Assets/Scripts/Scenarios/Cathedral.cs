@@ -32,12 +32,12 @@ public class Cathedral : ScenarioScript
                     if(aCount == 1)
                     {
                         // add to delver's treasures
-                        await TreasureAdjustment(currentDelver, 5);
+                        await TreasureAdjustmentSingle(currentDelver, 5);
                         // favored bonus
                         if (currentDelver.favored)
                         {
                             // add to delver's treasures
-                            await TreasureAdjustment(currentDelver, 3);
+                            await TreasureAdjustmentSingle(currentDelver, 3);
                         }
                     }
                     break;
@@ -46,11 +46,11 @@ public class Cathedral : ScenarioScript
             case 1:
                 {
                     // add to delver's treasures
-                    await TreasureAdjustment(currentDelver, 1);
+                    await TreasureAdjustmentSingle(currentDelver, 1);
                     // favored bonus
                     if (currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 2);
+                        await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     break;
                 }
@@ -61,12 +61,12 @@ public class Cathedral : ScenarioScript
                     if(cCount == delversSortedScores.Count)
                     {
                         // add to delver's treasures
-                        await TreasureAdjustment(currentDelver, 4);
+                        await TreasureAdjustmentSingle(currentDelver, 4);
                         // favored bonus
                         if (currentDelver.favored)
                         {
                             // add to delver's treasures
-                            await TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustmentSingle(currentDelver, 2);
                         }
                     }
                     break;

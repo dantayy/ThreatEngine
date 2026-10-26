@@ -27,12 +27,12 @@ public class PickPocketPavillion : ScenarioScript
             case 0:
                 {
                     // add to delver's treasures
-                    await TreasureAdjustment(currentDelver, 3);
+                    await TreasureAdjustmentSingle(currentDelver, 3);
                     // favored bonus
                     if (currentDelver.favored)
                     {
                         // add to delver's treasures
-                        await TreasureAdjustment(currentDelver, 3);
+                        await TreasureAdjustmentSingle(currentDelver, 3);
                     }
                     break;
                 }
@@ -40,14 +40,14 @@ public class PickPocketPavillion : ScenarioScript
             case 1:
                 {
                     // add to delver's treasures
-                    await TreasureAdjustment(currentDelver, 2);
+                    await TreasureAdjustmentSingle(currentDelver, 2);
                     // take from target's treasures
-                    await TreasureAdjustment(currentDelver.target, -2);
+                    await TreasureAdjustmentSingle(currentDelver.target, -2);
                     // favored bonus
                     if (currentDelver.favored)
                     {
                         // add treasures for every other player
-                        await TreasureAdjustment(currentDelver, delversSortedScores.Count - 2);
+                        await TreasureAdjustmentSingle(currentDelver, delversSortedScores.Count - 2);
                         // take from every other player
                         foreach (PlayerScript target in delversSortedScores)
                         {
@@ -56,7 +56,7 @@ public class PickPocketPavillion : ScenarioScript
                                 target.delverID != currentDelver.target.delverID
                             )
                             {
-                                await TreasureAdjustment(target, -1);
+                                await TreasureAdjustmentSingle(target, -1);
                             }
                         }
                     }
@@ -70,12 +70,12 @@ public class PickPocketPavillion : ScenarioScript
                     if (potentialThief.target == currentDelver)
                     {
                         // add treasures when stolen from
-                        await TreasureAdjustment(currentDelver, 4);
+                        await TreasureAdjustmentSingle(currentDelver, 4);
                         // favored bonus
                         if (currentDelver.favored)
                         {
                             // add to delver's treasures
-                            await TreasureAdjustment(currentDelver, 2);
+                            await TreasureAdjustmentSingle(currentDelver, 2);
                         }
                     }
                 }

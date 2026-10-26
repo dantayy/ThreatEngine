@@ -274,6 +274,9 @@ public class ManagerScript : MonoBehaviour
         timeRemaining = discussionTime;
         // set discussion flag for main event loop to catch and work with
         discussionFlag = true;
+        // update delver going first
+        // increment the starting player for the next round
+        firstDelver = firstDelver.rightDelver;
         // update guide text
         GuideText.text = "Discuss your choices now! Delver " + firstDelver.delverID + " begins the decision-making process in...";
         // display timer text
@@ -302,8 +305,6 @@ public class ManagerScript : MonoBehaviour
             // last player has already gone, player selection is over
             if(currentDelver == firstDelver)
             {
-                // increment the starting player for the next round
-                firstDelver = firstDelver.rightDelver;
                 // reset current delver
                 currentDelverSet = false;
                 // unset the flag
@@ -340,7 +341,7 @@ public class ManagerScript : MonoBehaviour
                 if(delver.target == null)
                 {
                     delver.target = delvers[UnityEngine.Random.Range(0, delvers.Count)];
-                    //Currently no penalty is incurred for not entering a target
+                    // currently no penalty is incurred for not entering a target
                 }
                 
                 // store the fact that choices were made randomly for applying the penalty later
@@ -396,6 +397,7 @@ public class ManagerScript : MonoBehaviour
                 if(currentDelver.spiritBribe < currentDelver.treasures)
                 {
                     currentDelver.spiritBribe++;
+                    Debug.Log("Spirit Bribe: " + currentDelver.spiritBribe);
                 }
                 break;
             case "ChoosePlayer1":
@@ -434,8 +436,8 @@ public class ManagerScript : MonoBehaviour
         await OnRevealChoices?.Invoke(this);
 
         // resolve the scenario
+        await currentScenario.ScenarioResolution(delvers, firstDelver);
         List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
-        await currentScenario.ScenarioResolution(delversSortedByTreasures, firstDelver);
         await OnActionResolutionCompleted?.Invoke(this, delversSortedByTreasures);
 
 

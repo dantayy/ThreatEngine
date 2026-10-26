@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,11 @@ public abstract class ScenarioScript : ScriptableObject
     // events
     public static event Func<PlayerScript, int, Task> OnTreasuresAdded;
     public static event Func<PlayerScript, int, Task> OnTreasuresRemoved;
+    public static event Func<PlayerScript, List<PlayerScript>, int, Task> OnTreasuresStolen;
     public static event Func<List<PlayerScript>, PlayerScript, Task> OnActionResolutionBegan;
+    public static event Func<List<PlayerScript>, bool, Task> OnChangePlayerInvolvement;
+    public static event Func<List<PlayerScript>, bool, Task> OnChangeIconInvolvement;
+    public static event Func<bool, Task> OnConditionResult;
 
     // delver having their scenario action resolved
     protected PlayerScript currentDelver;
@@ -37,10 +42,10 @@ public abstract class ScenarioScript : ScriptableObject
     protected bool delverFavored;
 
     // resolve scenario
-    public async Task ScenarioResolution(List<PlayerScript> delversSortedScores, PlayerScript delverGoingFirst)
+    public async Task ScenarioResolution(List<PlayerScript> delvers, PlayerScript delverGoingFirst)
     {
         Debug.Log("Resolving spirit calls");
-        await SpiritCallingResolutions(delversSortedScores);
+        await SpiritCallingResolutions(delvers);
         Debug.Log("Resolving actions for " + name);
         // reset the main tracker vars
         currentDelver = delverGoingFirst;
@@ -50,7 +55,7 @@ public abstract class ScenarioScript : ScriptableObject
         dCount = 0;
         delverFavored = false;
         // perform initial pass of delver choices to set trackers up
-        foreach(PlayerScript delver in delversSortedScores)
+        foreach(PlayerScript delver in delvers)
         {
             // set favored flag
             if(delver.favored)
@@ -78,47 +83,52 @@ public abstract class ScenarioScript : ScriptableObject
         // perform unique actions based on the child class' implementation until all delvers have had their actions resolved
         do
         {
+            // recalculate delver order by score between each action resolution
+            List<PlayerScript> delversSortedScores = delvers.OrderByDescending(obj => obj.treasures).ToList();
             await ActionResolutionBegan(delversSortedScores, currentDelver);
             await ActionResolutions(delversSortedScores);
-        }while(currentDelver != delverGoingFirst);
+
+            // move to next delver in turn order
+            currentDelver = currentDelver.rightDelver;
+        } while(currentDelver != delverGoingFirst);
     }
 
     // resolve delvers' spirit calling choices
-    async Task SpiritCallingResolutions(List<PlayerScript> delversSortedScores)
+    async Task SpiritCallingResolutions(List<PlayerScript> delvers)
     {
         // handle edge case of empty list of delvers being passed
-        if(delversSortedScores.Count == 0)
+        if(delvers.Count == 0)
         {
             return;
         }
 
         // trackers for whoever is currently favored, if anyone is
         bool spiritFavors = false;
-        PlayerScript currentlyFavored = delversSortedScores[0];
+        PlayerScript currentlyFavored = delvers[0];
 
         // highest briber
-        PlayerScript highestBriber = delversSortedScores[0];
+        PlayerScript highestBriber = delvers[0];
         // highest bribe
         int highestBribe = 0;
         // flag to ensure no dupe highest bribe are accepted
         bool uniqueHighest = true;
         // bribe totals between favored and non-favored
         int nonFavoredBribePool = 0;
-        int favoredBribeTotal = delversSortedScores.count - 1;
+        int favoredBribeTotal = delvers.Count - 1;
 
         // flag set by default to resort players based on score changes at the end
         // unset only in the rare case where no score changes occur
         bool scoreChange = true;
 
         // loop through all players and check for calling status
-        foreach (PlayerScript potentialCaller in delversSortedScores)
+        foreach (PlayerScript potentialCaller in delvers)
         {
             // delver made a bid
             if(potentialCaller.spiritBribe > 0)
             {
                 // lose one treasure for offering anything
                 // TODO: should this score change happen later?
-                await TreasureAdjustment(potentialCaller, -1);
+                await TreasureAdjustmentSingle(potentialCaller, -1);
                 // existing favored bid
                 if(potentialCaller.favored)
                 {
@@ -162,7 +172,7 @@ public abstract class ScenarioScript : ScriptableObject
                 if(uniqueHighest)
                 {
                     highestBriber.favored = true;
-                    await TreasureAdjustment(highestBriber, -(highestBriber.spiritBribe - 1));
+                    await TreasureAdjustmentSingle(highestBriber, -(highestBriber.spiritBribe - 1));
                 }
             }
             // favored wins
@@ -171,7 +181,7 @@ public abstract class ScenarioScript : ScriptableObject
                 // deduct anything else they offered to keep favor
                 if(currentlyFavored.spiritBribe > 0)
                 {
-                    await TreasureAdjustment(currentlyFavored, -(currentlyFavored.spiritBribe - 1));
+                    await TreasureAdjustmentSingle(currentlyFavored, -(currentlyFavored.spiritBribe - 1));
                 }
                 // nobody bid anything, no score change occurs
                 else if(nonFavoredBribePool == 0)
@@ -186,7 +196,7 @@ public abstract class ScenarioScript : ScriptableObject
             // set the flag
             highestBriber.favored = true;
             // remove the rest of their bribe on top of the one already paid in the main loop
-            await TreasureAdjustment(highestBriber, -(highestBriber.spiritBribe - 1));
+            await TreasureAdjustmentSingle(highestBriber, -(highestBriber.spiritBribe - 1));
         }
         // no one offered anything, no score changes occur
         else if(highestBribe == 0)
@@ -197,7 +207,7 @@ public abstract class ScenarioScript : ScriptableObject
         // re-sort delver score list to reflect the new scores if anything changed
         if(scoreChange)
         {
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
+            delvers.Sort((a,b) => a.treasures.CompareTo(b.treasures));
         }
     }
 
@@ -207,15 +217,41 @@ public abstract class ScenarioScript : ScriptableObject
         await Task.CompletedTask;
     }
 
-    protected async Task TreasureAdjustment(PlayerScript delver, int treasureDelta)
+    // Version of treasureAdjustments that takes in a single delver for convenience.
+    protected async Task TreasureAdjustmentSingle(PlayerScript delver, int treasureDelta)
     {
-        // log change for debugging (WILL slow things down if left on in release)
-        Debug.Log("Delver with ID " + delver.delverID + " gets " + treasureDelta + " treasures.");
+        List<PlayerScript> delvers = new List<PlayerScript>() { delver };
+        await TreasureAdjustments(delvers, treasureDelta);
+    }
 
-        if(treasureDelta > 0) { await OnTreasuresAdded?.Invoke(delver, treasureDelta); }
-        else if(treasureDelta < 0) { await OnTreasuresRemoved?.Invoke(delver, treasureDelta); }
+    // Trigger the animation for a player gaining / losing treasures.
+    protected async Task TreasureAdjustments(List<PlayerScript> delvers, int treasureDelta)
+    {
+        await ChangePlayerInvolvement(delvers, true);
+        
+        List<Task> tasks = new List<Task>();
+        foreach (PlayerScript delver in delvers)
+        {
+            // log change for debugging (WILL slow things down if left on in release)
+            Debug.Log("Delver with ID " + delver.delverID + " gets " + treasureDelta + " treasures.");
+            if (treasureDelta > 0) { tasks.Add(OnTreasuresAdded?.Invoke(delver, treasureDelta)); }
+            else if (treasureDelta < 0) { tasks.Add(OnTreasuresRemoved?.Invoke(delver, treasureDelta)); }
 
-        delver.treasures += treasureDelta;
+            delver.treasures += treasureDelta;
+        }
+        await Task.WhenAll(tasks);
+    }
+
+    // Trigger the animation for a player stealing treasures from other players.
+    protected async Task StealTreasures(PlayerScript thievingDelver, List<PlayerScript> affectedDelvers, int treasureDelta)
+    {
+        await ChangePlayerInvolvement(affectedDelvers, true);
+        List<Task> tasks = new List<Task>();
+        
+        foreach (PlayerScript delver in affectedDelvers) { delver.treasures -= treasureDelta; }
+        thievingDelver.treasures += treasureDelta * affectedDelvers.Count;
+        
+        await OnTreasuresStolen?.Invoke(thievingDelver, affectedDelvers, treasureDelta);
     }
 
     // Trigger the animation event for the beginning of a player's action resolution.
@@ -223,5 +259,23 @@ public abstract class ScenarioScript : ScriptableObject
     {
         // Thread-safe invocation using the null-conditional operator
         await OnActionResolutionBegan?.Invoke(delvers, currentDelver);
+    }
+
+    // Trigger the animation for player(s) being involved / uninvolved in a resolution effect.
+    protected async Task ChangePlayerInvolvement(List<PlayerScript> delvers, bool involve = true)
+    {
+        await OnChangePlayerInvolvement?.Invoke(delvers, involve);
+    }
+
+    // Trigger the animation for player choice icon(s) being involved / uninvolved in a resolution effect.
+    protected async Task ChangeIconInvolvement(List<PlayerScript> delvers, bool involve = true)
+    {
+        await OnChangeIconInvolvement?.Invoke(delvers, involve);
+    }
+
+    // Trigger the animation for a conditional effect succeeding or failing.
+    protected async Task ConditionResult(bool success = true)
+    {
+        await OnConditionResult?.Invoke(success);
     }
 }

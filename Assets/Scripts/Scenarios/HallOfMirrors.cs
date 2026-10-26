@@ -33,12 +33,12 @@ public class HallOfMirrors : ScenarioScript
                     // give treasures if exclusive
                     if(aCount == 1)
                     {
-                        await TreasureAdjustment(currentDelver, 1);
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
                     // favored bonus
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 3);
+                        await TreasureAdjustmentSingle(currentDelver, 3);
                     }
                     break;
                 }
@@ -48,12 +48,12 @@ public class HallOfMirrors : ScenarioScript
                     // give treasures if exclusive
                     if(bCount == 1)
                     {
-                        await TreasureAdjustment(currentDelver, 2);
+                        await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     // favored bonus
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 2);
+                        await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     break;
                 }
@@ -63,12 +63,12 @@ public class HallOfMirrors : ScenarioScript
                     // give treasures if exclusive
                     if(cCount == 1)
                     {
-                        await TreasureAdjustment(currentDelver, 3);
+                        await TreasureAdjustmentSingle(currentDelver, 3);
                     }
                     // favored bonus
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 1);
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
                     break;
                 }
@@ -78,7 +78,7 @@ public class HallOfMirrors : ScenarioScript
                     // give treasures if exclusive
                     if(dCount == 1)
                     {
-                        await TreasureAdjustment(currentDelver, 4);
+                        await TreasureAdjustmentSingle(currentDelver, 4);
                     }
                     break;
                 }

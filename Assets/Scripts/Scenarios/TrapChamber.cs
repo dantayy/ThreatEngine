@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Multiplayer.Center.Common;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TrapChamber", menuName = "Scriptable Objects/TrapChamber")]
@@ -25,10 +26,10 @@ public class TrapChamber : ScenarioScript
             // lose a finger
             case 0:
                 {
-                    await TreasureAdjustment(currentDelver, -1);
+                    await TreasureAdjustmentSingle(currentDelver, -1);
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 2);
+                        await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     break;
                 }
@@ -38,19 +39,21 @@ public class TrapChamber : ScenarioScript
                     // more treasures if all delvers take on the fire together
                     if(aCount == 0)
                     {
-                        await TreasureAdjustment(currentDelver, 4);
+                        await ConditionResult(true);
+                        await TreasureAdjustmentSingle(currentDelver, 4);
                         if(currentDelver.favored)
                         {
-                            await TreasureAdjustment(currentDelver, 6);
+                            await TreasureAdjustmentSingle(currentDelver, 6);
                         }
                     }
                     // negative treasures without unity
                     else
                     {
-                        await TreasureAdjustment(currentDelver, -3);
+                        await ConditionResult(false);
+                        await TreasureAdjustmentSingle(currentDelver, -3);
                         if(currentDelver.favored)
                         {
-                            await TreasureAdjustment(currentDelver, 1);
+                            await TreasureAdjustmentSingle(currentDelver, 1);
                         }
                     }
                     break;
@@ -58,9 +61,6 @@ public class TrapChamber : ScenarioScript
             default:
                 break;
         }
-
-        // re-sort delver scores list
-        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
 
         // move to next delver in turn order
         currentDelver = currentDelver.rightDelver;

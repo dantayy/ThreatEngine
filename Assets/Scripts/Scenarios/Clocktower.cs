@@ -30,12 +30,12 @@ public class Clocktower : ScenarioScript
                     // only give points if no delver is favored
                     if(!delverFavored)
                     {
-                        await TreasureAdjustment(currentDelver, 20);
+                        await TreasureAdjustmentSingle(currentDelver, 20);
                     }
                     // add extra treasures if favored
                     else if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 5);
+                        await TreasureAdjustmentSingle(currentDelver, 5);
                     }
                     break;
                 }
@@ -45,18 +45,15 @@ public class Clocktower : ScenarioScript
                     // grab current time
                     currentTime = DateTime.Now;
                     // calculate sum of digits in gear, then add to current delver's treasures
-                    await TreasureAdjustment(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
+                    await TreasureAdjustmentSingle(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
                     // add extra treasures if favored
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 1);
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
                     break;
                 }
         }
-
-        // re-sort delver scores list
-        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
 
         // move to next delver in turn order
         currentDelver = currentDelver.rightDelver;

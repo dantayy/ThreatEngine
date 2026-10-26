@@ -366,8 +366,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   delverID: 0
-  treasures: 0
+  treasures: 10
   callToSpirit: 0
+  spiritBribe: 0
   favored: 0
   actionIdx: -1
   leftDelver: {fileID: 0}
