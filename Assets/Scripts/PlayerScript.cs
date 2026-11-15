@@ -30,6 +30,10 @@ public class PlayerScript : MonoBehaviour
     public TextMeshProUGUI playerDebugText;
     public GameObject playerInputIcons;
 
+    // Player plaque is a separate prefab so it renders behind all player text.
+    // Text moves between players during swap and rotate animastions.
+    public GameObject playerPlaque;
+
     // Awake is called before Start
     void Awake()
     {

@@ -29,6 +29,11 @@ public abstract class ScenarioScript : ScriptableObject
     public static event Func<List<PlayerScript>, bool, Task> OnChangeIconInvolvement;
     public static event Func<bool, Task> OnConditionResult;
 
+    public static event Func<List<PlayerScript>, bool, Task> OnTreasuresRotated;
+    public static event Func<PlayerScript, PlayerScript, Task> OnTreasuresSwapped;
+    public static event Func<List<PlayerScript>, PlayerScript, Task> OnRandomDelver;
+    public static event Func<bool, Task> OnCoinFlip;
+
     // delver having their scenario action resolved
     protected PlayerScript currentDelver;
     // count of each action being taken
@@ -224,7 +229,7 @@ public abstract class ScenarioScript : ScriptableObject
         await TreasureAdjustments(delvers, treasureDelta);
     }
 
-    // Trigger the animation for a player gaining / losing treasures.
+    // Trigger the event for a player gaining / losing treasures.
     protected async Task TreasureAdjustments(List<PlayerScript> delvers, int treasureDelta)
     {
         await ChangePlayerInvolvement(delvers, true);
@@ -249,11 +254,10 @@ public abstract class ScenarioScript : ScriptableObject
         await StealTreasures(thievingDelver, delvers, treasureDelta);
     }
 
-    // Trigger the animation for a player stealing treasures from other players.
+    // Trigger the event for a player stealing treasures from other players.
     protected async Task StealTreasures(PlayerScript thievingDelver, List<PlayerScript> affectedDelvers, int treasureDelta)
     {
         await ChangePlayerInvolvement(affectedDelvers, true);
-        List<Task> tasks = new List<Task>();
 
         Debug.Log("Treasures stolen: " + treasureDelta);
         Debug.Log("Number of affected delvers: " + affectedDelvers.Count);
@@ -264,28 +268,85 @@ public abstract class ScenarioScript : ScriptableObject
         thievingDelver.treasures += treasureDelta * affectedDelvers.Count;
     }
 
-    // Trigger the animation event for the beginning of a player's action resolution.
+    // Trigger the event for the beginning of a player's action resolution.
     protected async Task ActionResolutionBegan(List<PlayerScript> delvers, PlayerScript currentDelver)
     {
         // Thread-safe invocation using the null-conditional operator
         await OnActionResolutionBegan?.Invoke(delvers, currentDelver);
     }
 
-    // Trigger the animation for player(s) being involved / uninvolved in a resolution effect.
+    // Trigger the event for player(s) being involved / uninvolved in a resolution effect.
     protected async Task ChangePlayerInvolvement(List<PlayerScript> delvers, bool involve = true)
     {
         await OnChangePlayerInvolvement?.Invoke(delvers, involve);
     }
 
-    // Trigger the animation for player choice icon(s) being involved / uninvolved in a resolution effect.
+    // Trigger the event for player choice icon(s) being involved / uninvolved in a resolution effect.
     protected async Task ChangeIconInvolvement(List<PlayerScript> delvers, bool involve = true)
     {
         await OnChangeIconInvolvement?.Invoke(delvers, involve);
     }
 
-    // Trigger the animation for a conditional effect succeeding or failing.
+    // Trigger the event for a conditional effect succeeding or failing.
     protected async Task ConditionResult(bool success = true)
     {
         await OnConditionResult?.Invoke(success);
+    }
+
+    // Trigger the event for all treasure totals shifting left or right.
+    protected async Task RotateTreasures(List<PlayerScript> delvers, bool rotateRight = true)
+    {
+        await ChangePlayerInvolvement(delvers, true);
+
+        // Store treasure totals for rotation
+        int[] treasureTotals = new int[delvers.Count];
+        foreach (PlayerScript delver in delvers)
+        {
+            treasureTotals[delver.delverID - 1] = delver.treasures;
+        }
+
+        // Rotate totals left or right
+        if (rotateRight)
+        {
+            foreach (PlayerScript delver in delvers)
+            {
+                delver.treasures = treasureTotals[delver.leftDelver.delverID - 1];
+            }
+        }
+        else
+        {
+            foreach (PlayerScript delver in delvers)
+            {
+                delver.treasures = treasureTotals[delver.rightDelver.delverID - 1];
+            }
+        }
+
+        await OnTreasuresRotated?.Invoke(delvers, rotateRight);
+    }
+
+    // Trigger the event for switching the treasure totals of two delvers.
+    protected async Task SwapTreasures(PlayerScript delver1, PlayerScript delver2)
+    {
+        List<PlayerScript> affectedDelvers = new List<PlayerScript>() { delver1, delver2 };
+        await ChangePlayerInvolvement(affectedDelvers);
+
+        int delver1Total = delver1.treasures;
+        delver1.treasures = delver2.treasures;
+        delver2.treasures = delver1Total;
+
+        await OnTreasuresSwapped(delver1, delver2);
+    }
+
+    // Trigger the event for picking a delver at random for the purpose of another effect.
+    protected async Task ChooseRandomDelver(List<PlayerScript> affectedDelvers, PlayerScript chosenDelver)
+    {
+        await ChangePlayerInvolvement(affectedDelvers);
+        await OnRandomDelver?.Invoke(affectedDelvers, chosenDelver);
+    }
+
+    // Trigger the event for a coin being flipped.
+    protected async Task FlipCoin(bool heads)
+    {
+        await OnCoinFlip?.Invoke(heads);
     }
 }

@@ -2,6 +2,7 @@ using DG.Tweening;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,12 @@ public class AnimationManagerScript : MonoBehaviour
     [SerializeField] List<OptionScript> options;
     [SerializeField] Image check;
     [SerializeField] Image cross;
-    [SerializeField] float animSpeedMultiplier; // Multiplier for all animation speeds
+    [SerializeField] Image randomSelectionArrow;
+    [SerializeField] GameObject coin;
+    [SerializeField] Sprite coinHeads;
+    [SerializeField] Sprite coinSide;
+    [SerializeField] Sprite coinTails;
+     [SerializeField] float animSpeedMultiplier; // Multiplier for all animation speeds
 
     public List<GameObject> delverIcons;
 
@@ -39,6 +45,8 @@ public class AnimationManagerScript : MonoBehaviour
     private void OnEnable()
     {
         ManagerScript.OnRevealChoices += RevealPlayerChoices;
+        ManagerScript.OnActionResolutionCompleted += CleanUpActionResolution;
+        
         ScenarioScript.OnActionResolutionBegan += ResetPlayerAndChoice;
         ScenarioScript.OnActionResolutionBegan += HighlightPlayerAndChoice;
         ScenarioScript.OnTreasuresAdded += AddTreasures;
@@ -47,12 +55,17 @@ public class AnimationManagerScript : MonoBehaviour
         ScenarioScript.OnChangePlayerInvolvement += ChangePlayerInvolvement;
         ScenarioScript.OnChangeIconInvolvement += ChangeIconInvolvement;
         ScenarioScript.OnConditionResult += DisplayConditionResult;
-        ManagerScript.OnActionResolutionCompleted += CleanUpActionResolution;
+        ScenarioScript.OnTreasuresRotated += RotateTreasures;
+        ScenarioScript.OnTreasuresSwapped += SwapTreasures;
+        ScenarioScript.OnRandomDelver += ChooseRandomDelver;
+        ScenarioScript.OnCoinFlip += FlipCoin;
     }
 
     private void OnDisable()
     {
         ManagerScript.OnRevealChoices -= RevealPlayerChoices;
+        ManagerScript.OnActionResolutionCompleted -= CleanUpActionResolution;
+
         ScenarioScript.OnActionResolutionBegan -= ResetPlayerAndChoice;
         ScenarioScript.OnActionResolutionBegan -= HighlightPlayerAndChoice;
         ScenarioScript.OnTreasuresAdded -= AddTreasures;
@@ -61,7 +74,10 @@ public class AnimationManagerScript : MonoBehaviour
         ScenarioScript.OnChangePlayerInvolvement -= ChangePlayerInvolvement;
         ScenarioScript.OnChangeIconInvolvement -= ChangeIconInvolvement;
         ScenarioScript.OnConditionResult -= DisplayConditionResult;
-        ManagerScript.OnActionResolutionCompleted -= CleanUpActionResolution;
+        ScenarioScript.OnTreasuresRotated -= RotateTreasures;
+        ScenarioScript.OnTreasuresSwapped -= SwapTreasures;
+        ScenarioScript.OnRandomDelver -= ChooseRandomDelver;
+        ScenarioScript.OnCoinFlip -= FlipCoin;
     }
 
     // Place player icons next to the choices they made.
@@ -103,11 +119,13 @@ public class AnimationManagerScript : MonoBehaviour
 
         //Fade all other delvers and their choice icons
         highlightSequence.Append(currentDelver.GetComponent<CanvasGroup>().DOFade(1, 0.5f * animSpeedMultiplier));
+        highlightSequence.Append(currentDelver.playerPlaque.GetComponent<CanvasGroup>().DOFade(1, 0.5f * animSpeedMultiplier));
         foreach(PlayerScript delver in delvers)
         {
             if(delver != currentDelver)
             {
                 highlightSequence.Join(delver.GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
+                highlightSequence.Join(delver.playerPlaque.GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
                 int iconId = delver.delverID - 1;
                 GameObject currentPlayerIcon = delverIcons[iconId];
                 highlightSequence.Join(currentPlayerIcon.GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
@@ -148,6 +166,8 @@ public class AnimationManagerScript : MonoBehaviour
             resetSequence.Join(option.GetComponent<RectTransform>().DOScale(0.5f, 0.5f * animSpeedMultiplier));
         }
 
+        resetSequence.Append(randomSelectionArrow.GetComponent<CanvasGroup>().DOFade(0f, 1.0f * animSpeedMultiplier));
+
         resetTasks.Add(resetSequence.AsyncWaitForCompletion());
         await Task.WhenAll(resetTasks);
     }
@@ -162,6 +182,7 @@ public class AnimationManagerScript : MonoBehaviour
         foreach(PlayerScript delver in delvers)
         {
             involveSequence.Join(delver.GetComponent<CanvasGroup>().DOFade(fadeLevel, 0.5f * animSpeedMultiplier));
+            involveSequence.Join(delver.playerPlaque.GetComponent<CanvasGroup>().DOFade(fadeLevel, 0.5f * animSpeedMultiplier));
         }
 
         involveTasks.Add(involveSequence.AsyncWaitForCompletion());
@@ -328,5 +349,198 @@ public class AnimationManagerScript : MonoBehaviour
         }
 
         await Task.WhenAll(stealTreasuresTasks);
+    }
+
+    // Rotate all delvers' treasure totals left or right.
+    private async Task RotateTreasures(List<PlayerScript> delvers, bool rotateRight)
+    {
+        List<Task> rotateTreasuresTasks = new List<Task>();
+        Sequence simultaneousRotateSequence = DOTween.Sequence();
+
+        Vector2[] scoreTextPositions = new Vector2[delvers.Count];
+        foreach (PlayerScript delver in delvers)
+        {
+            GameObject delverScoreTextObject = delver.playerScoreText.gameObject;
+            PlayerScript targetDelver = rotateRight ? delver.rightDelver : delver.leftDelver;
+            GameObject targetDelverScoreTextObject = targetDelver.playerScoreText.gameObject;
+
+            // Store the position of each delver's scoreText.
+            scoreTextPositions[delver.delverID - 1] = delverScoreTextObject.transform.position;
+
+            // Move each scoreText to the new delver.
+            if ((rotateRight && delver.delverID != delvers.Count) || !rotateRight && delver.delverID != 1)
+            {
+                simultaneousRotateSequence.Join(delverScoreTextObject.transform.DOMove(targetDelverScoreTextObject.transform.position, 1f * animSpeedMultiplier));
+                continue;
+            }
+
+            // Unique behavior for the text that is wrapping around the screen.
+            Vector3[] travelPoints = new Vector3[]
+                {
+                    new Vector2((targetDelverScoreTextObject.transform.position.x + delverScoreTextObject.transform.position.x) / 2, targetDelverScoreTextObject.transform.position.y + 100),
+                    targetDelverScoreTextObject.transform.position,
+                };
+
+            simultaneousRotateSequence.Join(delverScoreTextObject.transform.DOPath(travelPoints, 1f * animSpeedMultiplier, PathType.CatmullRom));
+        }
+
+        rotateTreasuresTasks.Add(simultaneousRotateSequence.AsyncWaitForCompletion());
+        await Task.WhenAll(rotateTreasuresTasks);
+
+        // Reset all scoreText positions and update them to the new values for a seamless transition.
+        foreach (PlayerScript delver in delvers)
+        {
+            TextMeshProUGUI delverScoreText = delver.playerScoreText;
+            delverScoreText.gameObject.transform.position = scoreTextPositions[delver.delverID - 1];
+            delverScoreText.text = delver.treasures.ToString();
+        }
+    }
+
+    // Switch the treasure totals of two delvers.
+    private async Task SwapTreasures(PlayerScript delver1, PlayerScript delver2)
+    {
+        List<Task> swapTreasuresTasks = new List<Task>();
+        Sequence simultaneousSwapSequence = DOTween.Sequence();
+
+        GameObject delverScoreTextObject = delver1.playerScoreText.gameObject;
+        GameObject targetDelverScoreTextObject = delver2.playerScoreText.gameObject;
+
+        Vector2[] scoreTextPositions = new Vector2[2];
+        scoreTextPositions[0] = delverScoreTextObject.transform.position;
+        scoreTextPositions[1] = targetDelverScoreTextObject.transform.position;
+
+        // Move one scoreText in a straight line
+        simultaneousSwapSequence.Join(delverScoreTextObject.transform.DOMove(targetDelverScoreTextObject.transform.position, 1f * animSpeedMultiplier));
+        
+        // Move the other scoreText in an arc
+        Vector3[] travelPoints = new Vector3[]
+                {
+                    new Vector2((targetDelverScoreTextObject.transform.position.x + delverScoreTextObject.transform.position.x) / 2, delverScoreTextObject.transform.position.y + 100),
+                    delverScoreTextObject.transform.position,
+                };
+        simultaneousSwapSequence.Join(targetDelverScoreTextObject.transform.DOPath(travelPoints, 1f * animSpeedMultiplier, PathType.CatmullRom));
+        
+        swapTreasuresTasks.Add(simultaneousSwapSequence.AsyncWaitForCompletion());
+        await Task.WhenAll(swapTreasuresTasks);
+
+        // Reset both scoreText positions and update them to the new values for a seamless transition.
+        delverScoreTextObject.transform.position = scoreTextPositions[0];
+        targetDelverScoreTextObject.transform.position = scoreTextPositions[1];
+        delver1.playerScoreText.text = delver1.treasures.ToString();
+        delver2.playerScoreText.text = delver2.treasures.ToString();
+    }
+
+    // Toss a coin that lands on heads or tails.
+    private async Task FlipCoin(bool heads)
+    {
+        List<Task> coinFlipTasks = new List<Task>();
+        Sequence coinFlipSequence = DOTween.Sequence();
+
+        SpriteRenderer coinSpriteRenderer = coin.GetComponent<SpriteRenderer>();
+        float totalDuration = 2.0f;
+        int halfSpins = 10;
+        float singleHalfSpinTime = totalDuration / halfSpins;
+
+        // Coin appears
+        coinFlipSequence.Join(coin.GetComponent<SpriteRenderer>().DOFade(1.0f, 0.25f * animSpeedMultiplier));
+
+        // Coin vertical movement
+        coinFlipSequence.Join(
+            coin.transform.DOLocalMoveY(transform.localPosition.y + 2.5f, totalDuration / 2f)
+                .SetEase(Ease.OutQuad)
+                .SetLoops(2, LoopType.Yoyo)
+        );
+
+        // Coin flipping while in the air
+        for (int i = 0; i < halfSpins; i++)
+        {
+            int step = i;
+            coinFlipSequence.Insert(
+                step * singleHalfSpinTime,
+                coin.transform.DORotate(new Vector3(0, 90f, 0), singleHalfSpinTime / 2f).SetEase(Ease.Linear)
+                    .OnComplete(() =>
+                    {
+                        // Alternate sprites on each half-spin. Guarantee the final result.
+                        if (step == halfSpins - 1)
+                        {
+                            coinSpriteRenderer.sprite = heads ? coinHeads: coinTails;
+                        }
+                        else
+                        {
+                            coinSpriteRenderer.sprite = coinSpriteRenderer.sprite == coinHeads ? coinTails : coinHeads;
+                        }
+                        coin.transform.eulerAngles = new Vector3(0, -90f, 0);
+                    })
+            );
+
+            coinFlipSequence.Insert(
+                (step * singleHalfSpinTime) + (singleHalfSpinTime / 2f),
+                coin.transform.DORotate(new Vector3(0, 0f, 0), singleHalfSpinTime / 2f).SetEase(Ease.Linear)
+            );
+        }
+
+        // Coin disappears
+        coinFlipSequence.AppendInterval(1f);
+        coinFlipSequence.Append(coin.GetComponent<SpriteRenderer>().DOFade(0.0f, 0.25f * animSpeedMultiplier));
+
+        coinFlipTasks.Add(coinFlipSequence.AsyncWaitForCompletion());
+        await Task.WhenAll(coinFlipTasks);
+    }
+
+    // Select one delver at random from a provided list for the purpose of another effect.
+    private async Task ChooseRandomDelver(List<PlayerScript> affectedDelvers, PlayerScript chosenDelver)
+    {
+        List<Task> randomDelverTasks = new List<Task>();
+        Sequence randomDelverSequence = DOTween.Sequence();
+
+        // Choose a random delver above which to initially position the selection arrow.
+        int currentIndex = Random.Range(0, affectedDelvers.Count - 1);
+        PlayerScript currentDelver = affectedDelvers[currentIndex];
+
+        randomSelectionArrow.transform.position = new Vector2(currentDelver.gameObject.transform.position.x, currentDelver.gameObject.transform.position.y + 180);
+        randomDelverSequence.Append(randomSelectionArrow.GetComponent<CanvasGroup>().DOFade(1.0f, 1.0f * animSpeedMultiplier));
+
+        // Choose a number of jumps for the arrow to make before stopping.
+        int numberOfJumps = 12 + Random.Range(0, affectedDelvers.Count * 3);
+        float randomSelectionSpeed = 0.25f;
+        Debug.Log("Jump count: " + numberOfJumps);
+
+        for(int i = 0; i < numberOfJumps; i++)
+        {
+            PlayerScript nextDelver = currentDelver.rightDelver;
+            Vector3[] travelPoints = new Vector3[]
+                {
+                    new Vector2((currentDelver.transform.position.x + nextDelver.transform.position.x) / 2, nextDelver.transform.position.y + 300),
+                     new Vector2(nextDelver.transform.position.x, nextDelver.transform.position.y + 180),
+                };
+            randomDelverSequence.Append(randomSelectionArrow.transform.DOPath(travelPoints, randomSelectionSpeed * animSpeedMultiplier, PathType.CatmullRom));
+
+            // When aren't very many jumps left, decrease animation speed.
+            if(i > numberOfJumps - 8)
+            {
+                randomSelectionSpeed += 0.05f;
+            }
+
+            if (i == (numberOfJumps - 1))
+            {
+                // Continue jumping until the chosen delver is reached.
+                if (nextDelver.delverID != chosenDelver.delverID)
+                {
+                    i--;
+                }
+
+                // Surprise final jump happens 1/10 times.
+                if(nextDelver.delverID == chosenDelver.delverID - 1 && (Random.Range(0, 9) == 0))
+                {
+                    randomDelverSequence.AppendInterval(2f * animSpeedMultiplier);
+                    randomSelectionSpeed = 3f;
+                }
+            }
+
+            currentDelver = nextDelver;
+        }
+
+        randomDelverTasks.Add(randomDelverSequence.AsyncWaitForCompletion());
+        await Task.WhenAll(randomDelverTasks);
     }
 }
