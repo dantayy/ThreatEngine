@@ -16,8 +16,6 @@ public class Casino : ScenarioScript
         actionEffects.Add("+5 [+3]");
         actionEffects.Add("Random delver [Pick a delver instead] loses all treasures.");
         actionEffects.Add("Flip a coin. [Flip two coins instead and use either result.] Heads: Double your treasures. Tails: Lose all your treasures.");
-
-        earlyGame = true;
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)

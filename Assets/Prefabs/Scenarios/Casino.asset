@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Casino
   m_EditorClassIdentifier: 
   scenarioTitle: The Casino
-  earlyGame: 1
+  earlyGame: 0
   lateGame: 0

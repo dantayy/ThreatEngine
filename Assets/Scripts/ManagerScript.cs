@@ -30,13 +30,16 @@ public class ManagerScript : MonoBehaviour
 
     // turn counter
     int turnCount = 1;
+    int maxTurns = 5;
+    int startMidgameScenarios = 3;
+    int startLategameScenarios = 5;
 
     // scenario pool variables
     [SerializeField] public List<ScenarioScript> scenarios;
 
-    List<ScenarioScript> earlyScenarios = new List<ScenarioScript>();
-    List<ScenarioScript> midScenarios = new List<ScenarioScript>();
-    List<ScenarioScript> lateScenarios = new List<ScenarioScript>();
+    public List<ScenarioScript> earlyScenarios = new List<ScenarioScript>();
+    public List<ScenarioScript> midScenarios = new List<ScenarioScript>();
+    public List<ScenarioScript> lateScenarios = new List<ScenarioScript>();
     ScenarioScript currentScenario;
     int scenarioIdx = 0;
     int currentScenarioOptionCount = 0;
@@ -212,7 +215,7 @@ public class ManagerScript : MonoBehaviour
         {
             // pick from a different pool of scenarios depending on how far into the game we are
             // early game
-            if(turnCount == 1)
+            if(turnCount < startMidgameScenarios)
             {
                 // edge case of all early game scenarios being played (impossible if at least one early game scenario is in the general pool)
                 if(earlyScenarios.Count == 0)
@@ -227,7 +230,7 @@ public class ManagerScript : MonoBehaviour
                 }
             }
             // mid game
-            else if(turnCount < 5)
+            else if(turnCount < startLategameScenarios)
             {
                 // edge case of all mid game scenarios being played
                 if(midScenarios.Count == 0)
@@ -445,7 +448,6 @@ public class ManagerScript : MonoBehaviour
         GameStateScript state = new GameStateScript(currentScenario);
 
         // determine if a winner exists and update the game state history
-        int maxTreasures = 20;
         PlayerScript triumphantDelver = null;
         foreach(PlayerScript delver in delvers)
         {
@@ -459,13 +461,29 @@ public class ManagerScript : MonoBehaviour
             {
                 state.spiritFavoredID = delver.delverID;
             }
-            if(delver.treasures >= maxTreasures)
+
+            // If it is the last round of the game, determine the winner.
+            if(turnCount >= maxTurns)
             {
-                maxTreasures = delver.treasures;
-                if(!triumphantDelver || triumphantDelver.treasures < maxTreasures || (triumphantDelver.treasures == delver.treasures && delver.favored))
+                int maxTreasures = delversSortedByTreasures[0].treasures;
+
+                // If one delver has the most treasures, they win.
+                if (maxTreasures > delversSortedByTreasures[1].treasures)
                 {
-                    triumphantDelver = delver;
+                    triumphantDelver = delversSortedByTreasures[0];
                 }
+                // If there is a tie, a tied delver with the spirit's favor wins.
+                else
+                {
+                    foreach(PlayerScript contendingDelver in delversSortedByTreasures)
+                    {
+                        if(contendingDelver.treasures == maxTreasures && contendingDelver.favored)
+                        {
+                            triumphantDelver = contendingDelver;
+                        }
+                    }
+                }
+                // If a winner has still not been determined, play another round.
             }
         }
 
