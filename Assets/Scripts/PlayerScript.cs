@@ -7,7 +7,7 @@ public class PlayerScript : MonoBehaviour
     // ID of delver
     public int delverID = -1;
     // number of treasures delver currently has
-    public int treasures = 0;
+    public int treasures = 10;
     // flag set when a delver calls to the spirit
     public bool callToSpirit = false;
     // number of treasures being offered to the spirit
@@ -30,6 +30,10 @@ public class PlayerScript : MonoBehaviour
     public TextMeshProUGUI playerDebugText;
     public GameObject playerInputIcons;
 
+    // Player plaque is a separate prefab so it renders behind all player text.
+    // Text moves between players during swap and rotate animastions.
+    public GameObject playerPlaque;
+
     // Awake is called before Start
     void Awake()
     {
@@ -37,6 +41,7 @@ public class PlayerScript : MonoBehaviour
         playerScoreText = transform.Find("PlayerScoreText").GetComponent<TextMeshProUGUI>();
         playerDebugText = transform.Find("PlayerDebugText").GetComponent<TextMeshProUGUI>();
         playerInputIcons = transform.Find("PlayerInputIcons").gameObject;
+        playerScoreText.text = treasures.ToString();
     }
 
     // Update is called once per frame

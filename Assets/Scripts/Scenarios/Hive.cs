@@ -29,12 +29,12 @@ public class Hive : ScenarioScript
                     // give treasures if others went down the other paths
                     if(bCount > 0 && cCount > 0)
                     {
-                        await TreasureAdjustment(currentDelver, 2);
+                        await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     // favored bonus
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 1);
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
                     break;
                 }
@@ -44,12 +44,12 @@ public class Hive : ScenarioScript
                     // give treasures if others went down the other paths
                     if(aCount > 0 && cCount > 0)
                     {
-                        await TreasureAdjustment(currentDelver, 2);
+                        await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     // favored bonus
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 1);
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
                     break;
                 }
@@ -59,23 +59,17 @@ public class Hive : ScenarioScript
                     // give treasures if others went down the other paths
                     if(aCount > 0 && bCount > 0)
                     {
-                        await TreasureAdjustment(currentDelver, 2);
+                        await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     // favored bonus
                     if(currentDelver.favored)
                     {
-                        await TreasureAdjustment(currentDelver, 1);
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
                     break;
                 }
             default:
                 break;
         }
-
-        // re-sort delver scores list
-        delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-        // move to next delver in turn order
-        currentDelver = currentDelver.rightDelver;
     }
 }
