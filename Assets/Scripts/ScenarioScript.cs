@@ -26,9 +26,6 @@ public abstract class ScenarioScript : ScriptableObject
     // mechanical descriptions of the outcomes of the actions being selected
     // TODO: use something other than the string type so we can write with more than plaintext
     [System.NonSerialized] public string[] actionEffects;
-    // flags set to consider a scenario as either early-game or late-game
-    [field: SerializeField] public bool earlyGame = false;
-    [field: SerializeField] public bool lateGame = false;
 
     // events
     public static event Func<PlayerScript, int, Task> OnTreasuresAdded;
@@ -55,28 +52,36 @@ public abstract class ScenarioScript : ScriptableObject
     // time for clocktower
     protected DateTime currentTime;
     // flag set when a delver is favored by the spirit
-    protected bool delverFavored;
+    protected bool aFavoredDelverExists;
+    protected PlayerScript delverGoingFirst;
+
+    protected List<PlayerScript> delversInTurnOrder;
+
+    protected List<GameStateScript> gameStateHistory;
 
     // resolve scenario
-    public async Task ScenarioResolution(List<PlayerScript> delvers, PlayerScript delverGoingFirst)
+    public async Task ScenarioResolution(List<PlayerScript> delvers, PlayerScript currentFirstDelver, List<GameStateScript> currentHistory)
     {
         Debug.Log("Resolving spirit calls");
         await SpiritCallingResolutions(delvers);
         Debug.Log("Resolving actions for " + name);
         // reset the main tracker vars
-        currentDelver = delverGoingFirst;
+        currentDelver = currentFirstDelver;
+        delverGoingFirst = currentFirstDelver;
+        delversInTurnOrder = delvers;
         westCount = 0;
         eastCount = 0;
         northCount = 0;
         southCount = 0;
-        delverFavored = false;
+        aFavoredDelverExists = false;
+        gameStateHistory = currentHistory;
         // perform initial pass of delver choices to set trackers up
         foreach(PlayerScript delver in delvers)
         {
             // set favored flag
             if(delver.favored)
             {
-                delverFavored = true;
+                aFavoredDelverExists = true;
             }
             // increment choice tracker
             if(delver.actionIdx == optionDirections.West)

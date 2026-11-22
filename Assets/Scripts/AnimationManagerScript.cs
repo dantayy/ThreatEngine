@@ -154,6 +154,7 @@ public class AnimationManagerScript : MonoBehaviour
         foreach(PlayerScript delver in delvers)
         {
             resetSequence.Join(delver.GetComponent<CanvasGroup>().DOFade(1.0f, 0.5f * animSpeedMultiplier));
+            resetSequence.Join(delver.playerPlaque.GetComponent<CanvasGroup>().DOFade(1.0f, 0.5f * animSpeedMultiplier));
             int iconId = delver.delverID - 1;
             GameObject currentPlayerIcon = delverIcons[iconId];
             resetSequence.Join(currentPlayerIcon.GetComponent<CanvasGroup>().DOFade(1.0f, 0.5f * animSpeedMultiplier));
@@ -167,7 +168,6 @@ public class AnimationManagerScript : MonoBehaviour
         }
 
         resetSequence.Append(randomSelectionArrow.GetComponent<CanvasGroup>().DOFade(0f, 1.0f * animSpeedMultiplier));
-
         resetTasks.Add(resetSequence.AsyncWaitForCompletion());
         await Task.WhenAll(resetTasks);
     }

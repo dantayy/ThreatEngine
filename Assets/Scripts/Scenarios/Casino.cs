@@ -64,7 +64,6 @@ public class Casino : ScenarioScript
                     // lose all treasures
                     await TreasureAdjustmentSingle(currentDelver, -currentDelver.treasures);
                     break;
-
                 }
             // roulette
             case optionDirections.North:

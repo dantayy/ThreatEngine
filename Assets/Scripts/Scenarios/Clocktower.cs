@@ -11,13 +11,11 @@ public class Clocktower : ScenarioScript
         scenarioTitle = "The Clocktower";
         SetActionCount(2);
 
-        // West
         actionTitles[(int)optionDirections.West] = "Knock the Bell";
         actionEffects[(int)optionDirections.West] = "+20 IF no one carries the spirit's favor. [Then +5]";
-        
-        // East
+
         actionTitles[(int)optionDirections.East] = "Align the Gears to Unlock a Path";
-        actionEffects[(int)optionDirections.East] = "+ points equal to the sum of digits in the minute portion of the time when the player resolves their turn. [Then +1]";
+        actionEffects[(int)optionDirections.East] = "+treasures equal to the sum of digits in the minute portion of the time when the player resolves their turn. [Then +1]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -43,7 +41,7 @@ public class Clocktower : ScenarioScript
             case optionDirections.East:
                 {
                     // only give points if no delver is favored
-                    if(!delverFavored)
+                    if(!aFavoredDelverExists)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 20);
                     }
@@ -54,6 +52,8 @@ public class Clocktower : ScenarioScript
                     }
                     break;
                 }
+            default:
+                break;
         }
     }
 }

@@ -14,6 +14,7 @@ public class ManagerScript : MonoBehaviour
     // UI elements
     [SerializeField] public Canvas GameCanvas;
     [SerializeField] public Button StartButton;
+    [SerializeField] public TextMeshProUGUI LocationName;
     [SerializeField] public TextMeshProUGUI GuideText;
     [SerializeField] public TextMeshProUGUI TimerText;
 
@@ -33,6 +34,9 @@ public class ManagerScript : MonoBehaviour
     [SerializeField] public List<ScenarioScript> earlyScenarios;
     [SerializeField] public List<ScenarioScript> midScenarios;
     [SerializeField] public List<ScenarioScript> lateScenarios;
+
+    // developer list for testing the same scenario(s) repeatedly. This overrides the regular lists.
+    [SerializeField] List<ScenarioScript> testScenarios;
     ScenarioScript currentScenario;
     int scenarioIdx = 0;
     int currentScenarioOptionCount = 0;
@@ -75,6 +79,7 @@ public class ManagerScript : MonoBehaviour
     void Start()
     {
         // hide header UI text initially
+        LocationName.enabled = false;
         GuideText.enabled = false;
         TimerText.gameObject.SetActive(false);
 
@@ -179,50 +184,42 @@ public class ManagerScript : MonoBehaviour
         // pick new scenario randomly
         else
         {
+            List<ScenarioScript> currentScenarioPool;
             // pick from a different pool of scenarios depending on how far into the game we are
             // early game
-            if(turnCount < startMidgameScenarios)
+            if (testScenarios.Count > 0)
             {
-                // edge case of all early game scenarios being played
-                if(earlyScenarios.Count == 0)
-                {
-                    Debug.Log("No early game scenarios remaining.");
-                }
-                else
-                {
-                    scenarioIdx = UnityEngine.Random.Range(0, earlyScenarios.Count);
-                    currentScenario = earlyScenarios[scenarioIdx];
-                    earlyScenarios.RemoveAt(scenarioIdx);
-                }
+                currentScenarioPool = testScenarios;
+            }
+            else if (turnCount < startMidgameScenarios)
+            {
+                currentScenarioPool = earlyScenarios;
             }
             // mid game
-            else if(turnCount < startLategameScenarios)
+            else if (turnCount < startLategameScenarios)
             {
-                // edge case of all mid game scenarios being played
-                if(midScenarios.Count == 0)
-                {
-                    Debug.Log("No mid game scenarios remaining!");
-                }
-                else
-                {
-                    scenarioIdx = UnityEngine.Random.Range(0, midScenarios.Count);
-                    currentScenario = midScenarios[scenarioIdx];
-                    midScenarios.RemoveAt(scenarioIdx);
-                }
+                currentScenarioPool = midScenarios;
             }
             // late game
             else
             {
-                // edge case of all late game scenarios being played
-                if(lateScenarios.Count == 0)
+                currentScenarioPool = lateScenarios;
+            }
+
+            // error if all scenarios have been played and removed from the current pool
+            if (currentScenarioPool.Count == 0)
+            {
+                Debug.Log("No scenarios remaining for the current depth.");
+            }
+            else
+            {
+                scenarioIdx = UnityEngine.Random.Range(0, currentScenarioPool.Count);
+                currentScenario = currentScenarioPool[scenarioIdx];
+
+                // don't remove scenarios from the testing pool to allow for repeat testing in one session
+                if (currentScenarioPool != testScenarios)
                 {
-                    Debug.Log("No late game scenarios remaining!");
-                }
-                else
-                {
-                    scenarioIdx = UnityEngine.Random.Range(0, lateScenarios.Count);
-                    currentScenario = lateScenarios[scenarioIdx];
-                    lateScenarios.RemoveAt(scenarioIdx);
+                    currentScenarioPool.RemoveAt(scenarioIdx);
                 }
             }
         }
@@ -238,6 +235,9 @@ public class ManagerScript : MonoBehaviour
             currentOption.effect = currentScenario.actionEffects[i];
             currentOption.DisplayOption();
         }
+        // display location name
+        LocationName.text = currentScenario.scenarioTitle;
+        LocationName.enabled = true;
 
         // initiate discussion timer
         timeRemaining = discussionTime;
@@ -405,7 +405,7 @@ public class ManagerScript : MonoBehaviour
         await OnRevealChoices?.Invoke(this);
 
         // resolve the scenario
-        await currentScenario.ScenarioResolution(delvers, firstDelver);
+        await currentScenario.ScenarioResolution(delvers, firstDelver, gameStateHistory);
         List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
         await OnActionResolutionCompleted?.Invoke(this, delversSortedByTreasures);
 
