@@ -8,16 +8,16 @@ public class Cathedral : ScenarioScript
     public Cathedral()
     {
         scenarioTitle = "The Cathedral";
+        SetActionCount(3);
+
+        actionTitles[(int)optionDirections.West] = "Pray alone";
+        actionEffects[(int)optionDirections.West] = "+5 [+3] IF only you choose this";
         
-        actionTitles.Add("Pray alone");
-        actionTitles.Add("Take from the offering bin");
-        actionTitles.Add("Break the marble effigy together");
+        actionTitles[(int)optionDirections.East] = "Take from the offering bin";
+        actionEffects[(int)optionDirections.East] = "+1 [+2]";
 
-        actionEffects.Add("+5 [+3] IF only you choose this");
-        actionEffects.Add("+1 [+2]");
-        actionEffects.Add("+4 [+2] IF everyone chooses this");
-
-        earlyGame = true;
+        actionTitles[(int)optionDirections.North] = "Break the marble effigy together";
+        actionEffects[(int)optionDirections.North] = "+4 [+2] IF everyone chooses this";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -25,11 +25,23 @@ public class Cathedral : ScenarioScript
         // handle each possible action choice
         switch (currentDelver.actionIdx)
         {
+            // take from the offering bin
+            case optionDirections.West:
+                {
+                    // add to delver's treasures
+                    await TreasureAdjustmentSingle(currentDelver, 1);
+                    // favored bonus
+                    if (currentDelver.favored)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 2);
+                    }
+                    break;
+                }
             // pray alone
-            case 0:
+            case optionDirections.East:
                 {
                     // this delver IS the only one praying, dole out the treasures
-                    if(aCount == 1)
+                    if(westCount == 1)
                     {
                         // add to delver's treasures
                         await TreasureAdjustmentSingle(currentDelver, 5);
@@ -42,23 +54,11 @@ public class Cathedral : ScenarioScript
                     }
                     break;
                 }
-            // take from the offering bin
-            case 1:
-                {
-                    // add to delver's treasures
-                    await TreasureAdjustmentSingle(currentDelver, 1);
-                    // favored bonus
-                    if (currentDelver.favored)
-                    {
-                        await TreasureAdjustmentSingle(currentDelver, 2);
-                    }
-                    break;
-                }
             // Break the marble effigy together
-            case 2:
+            case optionDirections.North:
                 {
                     // EVERYONE is working to break the effigy together, dole out treasures
-                    if(cCount == delversSortedScores.Count)
+                    if(northCount == delversSortedScores.Count)
                     {
                         // add to delver's treasures
                         await TreasureAdjustmentSingle(currentDelver, 4);

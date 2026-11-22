@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 [CreateAssetMenu(fileName = "RotatingPlatform", menuName = "Scriptable Objects/RotatingPlatform")]
 public class RotatingPlatform : ScenarioScript
@@ -9,16 +8,19 @@ public class RotatingPlatform : ScenarioScript
     public RotatingPlatform()
     {
         scenarioTitle = "The Rotating Platform";
+        SetActionCount(4);
 
-        actionTitles.Add("Spin left");
-        actionTitles.Add("Spin right");
-        actionTitles.Add("Jump to the center");
-        actionTitles.Add("Test the limits of the mechanisms");
+        actionTitles[(int)optionDirections.West] = "Spin left";
+        actionEffects[(int)optionDirections.West] = "[Rotate point totals to the left. Then] +2";
 
-        actionEffects.Add("[Rotate point totals to the left. Then] +2");
-        actionEffects.Add("[Rotate point totals to the right. Then] +2");
-        actionEffects.Add("Pick a delver. Steal 1 from them. [Then steal 1 from each opponent.]");
-        actionEffects.Add("[Rotate point totals to the right twice. Then] +3 IF two or fewer delvers pick this.");
+        actionTitles[(int)optionDirections.East] = "Spin right";
+        actionEffects[(int)optionDirections.East] = "[Rotate point totals to the right. Then] +2";
+
+        actionTitles[(int)optionDirections.North] = "Jump to the center";
+        actionEffects[(int)optionDirections.North] = "Pick a delver. Steal 1 from them. [Then steal 1 from each opponent.]";
+
+        actionTitles[(int)optionDirections.South] = "Test the limits of the mechanisms";
+        actionEffects[(int)optionDirections.South] = "[Rotate point totals to the right twice. Then] +3 IF two or fewer delvers pick this.";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -27,7 +29,7 @@ public class RotatingPlatform : ScenarioScript
         switch (currentDelver.actionIdx)
         {
             // left
-            case 0:
+            case optionDirections.West:
                 {
                     // favored bonus
                     if (currentDelver.favored)
@@ -39,7 +41,7 @@ public class RotatingPlatform : ScenarioScript
                     break;
                 }
             // right
-            case 1:
+            case optionDirections.East:
                 {
                     // favored bonus
                     if (currentDelver.favored)
@@ -51,7 +53,7 @@ public class RotatingPlatform : ScenarioScript
                     break;
                 }
             // center
-            case 2:
+            case optionDirections.North:
                 {
                     // steal from one opponent
                     await StealTreasuresSingle(currentDelver, currentDelver.target, 1);
@@ -75,7 +77,7 @@ public class RotatingPlatform : ScenarioScript
 
                 }
             // test the limits
-            case 3:
+            case optionDirections.South:
                 {
                     // favored bonus
                     if (currentDelver.favored)
@@ -84,7 +86,7 @@ public class RotatingPlatform : ScenarioScript
                         await RotateTreasures(delversSortedScores, true);
                     }
 
-                    if(dCount <= 2)
+                    if(southCount <= 2)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 3);
                     }

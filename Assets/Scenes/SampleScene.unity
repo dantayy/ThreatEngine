@@ -1238,7 +1238,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 873aab7dbc9d2774e85e0a852b169de3, type: 3}
     - target: {fileID: 7282984781317284715, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_text
-      value: C
+      value: East
       objectReference: {fileID: 0}
     - target: {fileID: 7521916734149170568, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Sprite
@@ -1326,7 +1326,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Name
-      value: Option3
+      value: OptionEast
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_IsActive
@@ -3051,9 +3051,9 @@ RectTransform:
   - {fileID: 1128244207}
   - {fileID: 129069419}
   - {fileID: 25580791}
-  - {fileID: 2017141034}
   - {fileID: 2086075913}
   - {fileID: 369313762}
+  - {fileID: 2017141034}
   - {fileID: 967824990}
   - {fileID: 901781369}
   - {fileID: 758669616}
@@ -3590,7 +3590,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 138d910028833b848a41daaf47706b89, type: 3}
     - target: {fileID: 7282984781317284715, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_text
-      value: D
+      value: South
       objectReference: {fileID: 0}
     - target: {fileID: 7521916734149170568, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Sprite
@@ -3678,7 +3678,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Name
-      value: Option4
+      value: OptionSouth
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_IsActive
@@ -5791,25 +5791,13 @@ MonoBehaviour:
   TimerText: {fileID: 25580792}
   playerTurnTime: 10
   discussionTime: 3
-  scenarios:
-  - {fileID: 11400000, guid: f719363c1bc500b418dcb7cdc46f5672, type: 2}
-  - {fileID: 11400000, guid: 9da35fc9a836a804d9111496afea0915, type: 2}
-  - {fileID: 11400000, guid: 385a7fdcd58870b408ef1fd1f624f4d1, type: 2}
-  - {fileID: 11400000, guid: bbbe15c406edad545a43829add75adb2, type: 2}
-  - {fileID: 11400000, guid: de1c315aabf2d274a8acb2338a49b3dc, type: 2}
-  - {fileID: 11400000, guid: 3dcf12672b9eaca4a9292b777f5175a2, type: 2}
-  - {fileID: 11400000, guid: 2944c597a27575d40af9e362c0802f8f, type: 2}
-  - {fileID: 11400000, guid: 7bd2a3a3488272246b23886ce7f22b3c, type: 2}
-  - {fileID: 11400000, guid: a491eac9bde64bb4397e783eaa044108, type: 2}
-  - {fileID: 11400000, guid: 14bc55d1e8714fa4ca4cfda8a938781a, type: 2}
-  - {fileID: 11400000, guid: f719363c1bc500b418dcb7cdc46f5672, type: 2}
   earlyScenarios: []
   midScenarios: []
   lateScenarios: []
   optionDisplays:
-  - {fileID: 2017141035}
   - {fileID: 2086075914}
   - {fileID: 369313763}
+  - {fileID: 2017141035}
   - {fileID: 967824991}
   delver1: {fileID: 406503445}
   delver2: {fileID: 681587394}
@@ -7253,7 +7241,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: a97827aed9103e44ca8af5e7130f6b89, type: 3}
     - target: {fileID: 7282984781317284715, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_text
-      value: A
+      value: North
       objectReference: {fileID: 0}
     - target: {fileID: 7303340731326858915, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_IsActive
@@ -7345,7 +7333,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Name
-      value: Option1
+      value: OptionNorth
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_IsActive
@@ -7616,7 +7604,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: d15d26bd7dc74864081f04f6fb129dab, type: 3}
     - target: {fileID: 7282984781317284715, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_text
-      value: B
+      value: West
       objectReference: {fileID: 0}
     - target: {fileID: 7521916734149170568, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Sprite
@@ -7704,7 +7692,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_Name
-      value: Option2
+      value: OptionWest
       objectReference: {fileID: 0}
     - target: {fileID: 8713177951049756595, guid: cb50841276d1bd94487a26ec0456a0e0, type: 3}
       propertyPath: m_IsActive

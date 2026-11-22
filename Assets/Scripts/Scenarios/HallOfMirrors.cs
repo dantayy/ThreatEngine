@@ -8,18 +8,23 @@ public class HallOfMirrors : ScenarioScript
     public HallOfMirrors()
     {
         scenarioTitle = "The Hall Of Mirrors";
-        
-        actionTitles.Add("Listen for the spirit's guidance");
-        actionTitles.Add("Take your time");
-        actionTitles.Add("Look for a trail to follow");
-        actionTitles.Add("Cannonball run");
+        SetActionCount(4);
 
-        actionEffects.Add("+1 IF only you pick this [+3]");
-        actionEffects.Add("+2 IF only you pick this [+2]");
-        actionEffects.Add("+3 IF only you pick this [+1]");
-        actionEffects.Add("+4 IF only you pick this [+0]");
+        // West
+        actionTitles[(int)optionDirections.West] = "Listen for the spirit's guidance";
+        actionEffects[(int)optionDirections.West] = "+1 IF only you pick this [+3]";
 
-        earlyGame = true;
+        // East
+        actionTitles[(int)optionDirections.East] = "Take your time";
+        actionEffects[(int)optionDirections.East] = "+2 IF only you pick this [+2]";
+
+        // North
+        actionTitles[(int)optionDirections.North] = "Look for a trail to follow";
+        actionEffects[(int)optionDirections.North] = "+3 IF only you pick this [+1]";
+
+        // South
+        actionTitles[(int)optionDirections.South] = "Cannonball run";
+        actionEffects[(int)optionDirections.South] = "+4 IF only you pick this [+0]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -28,10 +33,10 @@ public class HallOfMirrors : ScenarioScript
         switch (currentDelver.actionIdx)
         {
             // listen for the spirit's guidance
-            case 0:
+            case optionDirections.West:
                 {
                     // give treasures if exclusive
-                    if(aCount == 1)
+                    if(westCount == 1)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 1);
                     }
@@ -43,10 +48,10 @@ public class HallOfMirrors : ScenarioScript
                     break;
                 }
             // take your time
-            case 1:
+            case optionDirections.East:
                 {
                     // give treasures if exclusive
-                    if(bCount == 1)
+                    if(eastCount == 1)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 2);
                     }
@@ -58,10 +63,10 @@ public class HallOfMirrors : ScenarioScript
                     break;
                 }
             // look for a trail to follow
-            case 2:
+            case optionDirections.North:
                 {
                     // give treasures if exclusive
-                    if(cCount == 1)
+                    if(northCount == 1)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 3);
                     }
@@ -73,10 +78,10 @@ public class HallOfMirrors : ScenarioScript
                     break;
                 }
             // cannonball run
-            case 3:
+            case optionDirections.South:
                 {
                     // give treasures if exclusive
-                    if(dCount == 1)
+                    if(southCount == 1)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 4);
                     }

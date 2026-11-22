@@ -87,7 +87,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "OptionA",
+                    "name": "OptionNorth",
                     "type": "Button",
                     "id": "29ef4312-6e25-4c09-8055-2049af52e145",
                     "expectedControlType": "",
@@ -96,7 +96,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "OptionB",
+                    "name": "OptionWest",
                     "type": "Button",
                     "id": "17da3a89-a16f-464e-a021-8649392443e3",
                     "expectedControlType": "",
@@ -105,7 +105,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "OptionC",
+                    "name": "OptionEast",
                     "type": "Button",
                     "id": "6205b8a5-84cb-4d70-a38d-dff14e215306",
                     "expectedControlType": "",
@@ -114,7 +114,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "OptionD",
+                    "name": "OptionSouth",
                     "type": "Button",
                     "id": "9497a042-4d96-43d3-93d6-e8f1254c3d16",
                     "expectedControlType": "",
@@ -570,7 +570,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "OptionA",
+                    "action": "OptionNorth",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -581,7 +581,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionA",
+                    "action": "OptionNorth",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -592,7 +592,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionA",
+                    "action": "OptionNorth",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -603,7 +603,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "OptionB",
+                    "action": "OptionWest",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -614,7 +614,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionB",
+                    "action": "OptionWest",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -625,7 +625,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionB",
+                    "action": "OptionWest",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -636,7 +636,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "OptionC",
+                    "action": "OptionEast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -647,7 +647,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionC",
+                    "action": "OptionEast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -658,7 +658,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionC",
+                    "action": "OptionEast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -669,7 +669,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "OptionD",
+                    "action": "OptionSouth",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -680,7 +680,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionD",
+                    "action": "OptionSouth",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -691,7 +691,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "OptionD",
+                    "action": "OptionSouth",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -1,12 +1,8 @@
-using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -34,19 +30,15 @@ public class ManagerScript : MonoBehaviour
     int startMidgameScenarios = 3;
     int startLategameScenarios = 5;
 
-    // scenario pool variables
-    [SerializeField] public List<ScenarioScript> scenarios;
-
-    public List<ScenarioScript> earlyScenarios = new List<ScenarioScript>();
-    public List<ScenarioScript> midScenarios = new List<ScenarioScript>();
-    public List<ScenarioScript> lateScenarios = new List<ScenarioScript>();
+    [SerializeField] public List<ScenarioScript> earlyScenarios;
+    [SerializeField] public List<ScenarioScript> midScenarios;
+    [SerializeField] public List<ScenarioScript> lateScenarios;
     ScenarioScript currentScenario;
     int scenarioIdx = 0;
     int currentScenarioOptionCount = 0;
 
     // UI elements for displaying scenario option details
     public List<OptionScript> optionDisplays;
-    private string[] optionIDs = { "A", "B", "C", "D" };
 
     // players to be managed
     [SerializeField] public PlayerScript delver1;
@@ -125,23 +117,6 @@ public class ManagerScript : MonoBehaviour
         // TODO: let players choose this by vote instead?
         firstDelver = delvers[UnityEngine.Random.Range(0, delvers.Count())];
 
-        // fill the early, mid, and late game scenario lists
-        foreach(ScenarioScript scenario in scenarios)
-        {
-            if(scenario.earlyGame)
-            {
-                earlyScenarios.Add(scenario);
-            }
-            else if(scenario.lateGame)
-            {
-                lateScenarios.Add(scenario);
-            }
-            else
-            {
-                midScenarios.Add(scenario);
-            }
-        }
-
         // instantiate history
         gameStateHistory = new List<GameStateScript>();
     }
@@ -190,16 +165,7 @@ public class ManagerScript : MonoBehaviour
         // reset game state history
         gameStateHistory.Clear();
 
-        // no scenarios to pull from, abort
-        if(scenarios.Count == 0)
-        {
-            Debug.Log("No scenarios available! Aborting!!!");
-            Application.Quit();
-        }
-        else
-        {
-            SetUpScenario();
-        }
+        SetUpScenario();
     }
 
     // select a scenario and display its options for players to choose
@@ -217,10 +183,10 @@ public class ManagerScript : MonoBehaviour
             // early game
             if(turnCount < startMidgameScenarios)
             {
-                // edge case of all early game scenarios being played (impossible if at least one early game scenario is in the general pool)
+                // edge case of all early game scenarios being played
                 if(earlyScenarios.Count == 0)
                 {
-                    currentScenario = scenarios[UnityEngine.Random.Range(0, scenarios.Count)];
+                    Debug.Log("No early game scenarios remaining.");
                 }
                 else
                 {
@@ -235,7 +201,7 @@ public class ManagerScript : MonoBehaviour
                 // edge case of all mid game scenarios being played
                 if(midScenarios.Count == 0)
                 {
-                    currentScenario = scenarios[UnityEngine.Random.Range(0, scenarios.Count)];
+                    Debug.Log("No mid game scenarios remaining!");
                 }
                 else
                 {
@@ -250,7 +216,7 @@ public class ManagerScript : MonoBehaviour
                 // edge case of all late game scenarios being played
                 if(lateScenarios.Count == 0)
                 {
-                    currentScenario = scenarios[UnityEngine.Random.Range(0, scenarios.Count)];
+                    Debug.Log("No late game scenarios remaining!");
                 }
                 else
                 {
@@ -261,7 +227,7 @@ public class ManagerScript : MonoBehaviour
             }
         }
 
-        currentScenarioOptionCount = currentScenario.actionTitles.Count;
+        currentScenarioOptionCount = currentScenario.actionTitles.Count();
 
         // fill the option prefabs with this scenario's information
         for (int i = 0; i < currentScenarioOptionCount; i++)
@@ -330,11 +296,11 @@ public class ManagerScript : MonoBehaviour
             // if any players didn't make choices in time, make a random choice for them and mark them to receive a penalty
             foreach(PlayerScript delver in delvers)
             {
-                int randomChoice = UnityEngine.Random.Range(0, currentScenarioOptionCount);
+                optionDirections randomChoice = (optionDirections)UnityEngine.Random.Range(0, currentScenarioOptionCount);
                 bool choseRandomly = false;
 
                 // choose a random option if necessary
-                if(delver.actionIdx == -1)
+                if(delver.actionIdx == optionDirections.None)
                 {
                     delver.actionIdx = randomChoice;
                     choseRandomly = true;
@@ -351,7 +317,7 @@ public class ManagerScript : MonoBehaviour
                 delver.choseRandomly = choseRandomly;
                 if(choseRandomly)
                 {
-                    delver.playerDebugText.text = "Chose Randomly (" + optionIDs[randomChoice] + ")";
+                    delver.playerDebugText.text = "Chose Randomly (" + randomChoice + ")";
                 }
             }
             GuideText.text = "Selections made! Resolving choices now...";
@@ -372,28 +338,28 @@ public class ManagerScript : MonoBehaviour
         // lock in choices for whatever player is currently in play
         switch (context.action.name)
         {
-            case "OptionA":
-                currentDelver.actionIdx = 0;
-                currentDelver.playerDebugText.text = "Chose A";
+            case "OptionWest":
+                currentDelver.actionIdx = optionDirections.West;
+                currentDelver.playerDebugText.text = "Chose West";
                 break;
-            case "OptionB":
+            case "OptionEast":
                 if (currentScenarioOptionCount <= 1) { break; }
-                currentDelver.actionIdx = 1;
-                currentDelver.playerDebugText.text = "Chose B";
+                currentDelver.actionIdx = optionDirections.East;
+                currentDelver.playerDebugText.text = "Chose East";
                 break;
-            case "OptionC":
+            case "OptionNorth":
                 if (currentScenarioOptionCount <= 2) { break; }
-                currentDelver.actionIdx = 2;
-                currentDelver.playerDebugText.text = "Chose C";
+                currentDelver.actionIdx = optionDirections.North;
+                currentDelver.playerDebugText.text = "Chose North";
                 break;
-            case "OptionD":
+            case "OptionSouth":
                 if(currentScenarioOptionCount <= 3) { break; }
-                currentDelver.actionIdx = 3;
-                currentDelver.playerDebugText.text = "Chose D";
+                currentDelver.actionIdx = optionDirections.South;
+                currentDelver.playerDebugText.text = "Chose South";
                 break;
             case "Confirm":
                 Debug.Log("Confirming choice");
-                if(currentDelver.actionIdx != -1) { timeRemaining = 0; }
+                if(currentDelver.actionIdx != optionDirections.None) { timeRemaining = 0; }
                 break;
             case "ThreatAction":
                 currentDelver.callToSpirit = true;
@@ -516,8 +482,8 @@ public class ManagerScript : MonoBehaviour
                 {
                     Debug.Log("Delver " + delver.delverID + " - ");
                     Debug.Log("Spirit Called: " + gameStateHistory[turn].spiritCalled[delver]);
-                    Debug.Log("Action: " + gameStateHistory[turn].scenario.actionTitles[gameStateHistory[turn].delverChoices[delver]]);
-                    Debug.Log("Description: " + gameStateHistory[turn].scenario.actionEffects[gameStateHistory[turn].delverChoices[delver]]);
+                    Debug.Log("Action: " + gameStateHistory[turn].scenario.actionTitles[(int)gameStateHistory[turn].delverChoices[delver]]);
+                    Debug.Log("Description: " + gameStateHistory[turn].scenario.actionEffects[(int)gameStateHistory[turn].delverChoices[delver]]);
                     Debug.Log("Treasures: " + gameStateHistory[turn].delverScores[delver]);
                     Debug.Log("Target: " + gameStateHistory[turn].delverTargets[delver]);
                 }

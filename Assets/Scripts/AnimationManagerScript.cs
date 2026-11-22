@@ -92,11 +92,11 @@ public class AnimationManagerScript : MonoBehaviour
         {
             int iconId = delver.delverID - 1;
             GameObject currentPlayerIcon = delverIcons[iconId];
-            GameObject chosenOption = options[delver.actionIdx].gameObject;
+            GameObject chosenOption = options[(int)delver.actionIdx].gameObject;
 
             // Shift icons to the right so they don't overlap when multiple players choose the same option.
-            optionChosenCount[delver.actionIdx] += 1;
-            float offset = optionChosenCount[delver.actionIdx] * currentPlayerIcon.GetComponent<RectTransform>().rect.width + 5f;
+            optionChosenCount[(int)delver.actionIdx] += 1;
+            float offset = optionChosenCount[(int)delver.actionIdx] * currentPlayerIcon.GetComponent<RectTransform>().rect.width + 5f;
             Rect optionRect = chosenOption.GetComponent<RectTransform>().rect;
 
             // Move the invisible icons to a location near the option chosen by the player.
@@ -134,10 +134,10 @@ public class AnimationManagerScript : MonoBehaviour
         }
 
         //Fade all other options
-        highlightSequence.Append(options[currentDelver.actionIdx].GetComponent<RectTransform>().DOScale(0.7f, 0.5f * animSpeedMultiplier));
+        highlightSequence.Append(options[(int)currentDelver.actionIdx].GetComponent<RectTransform>().DOScale(0.7f, 0.5f * animSpeedMultiplier));
         for(int i = 0; i < options.Count; i++)
         {
-            if (i == currentDelver.actionIdx) { continue; }
+            if (i == (int)currentDelver.actionIdx) { continue; }
             highlightSequence.Join(options[i].GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
         }
 

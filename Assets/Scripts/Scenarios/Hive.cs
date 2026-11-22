@@ -8,14 +8,16 @@ public class Hive : ScenarioScript
     public Hive()
     {
         scenarioTitle = "The Hive";
-        
-        actionTitles.Add("Sneak left");
-        actionTitles.Add("Sneak down the middle");
-        actionTitles.Add("Sneak right");
+        SetActionCount(3);
 
-        actionEffects.Add("+2 IF B AND C are also picked. [+1]");
-        actionEffects.Add("+2 IF A AND C are also picked [+1]");
-        actionEffects.Add("+2 IF A AND B are also picked [+1]");
+        actionTitles[(int)optionDirections.West] = "Sneak left";
+        actionEffects[(int)optionDirections.West] = "+2 IF North AND East are also picked. [+1]";
+        
+        actionTitles[(int)optionDirections.East] = "Sneak right";
+        actionEffects[(int)optionDirections.East] = "+2 IF North AND West are also picked [+1]";
+        
+        actionTitles[(int)optionDirections.North] = "Sneak down the middle";
+        actionEffects[(int)optionDirections.North] = "+2 IF West AND East are also picked [+1]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -24,25 +26,10 @@ public class Hive : ScenarioScript
         switch (currentDelver.actionIdx)
         {
             // sneak left
-            case 0:
+            case optionDirections.West:
                 {
                     // give treasures if others went down the other paths
-                    if(bCount > 0 && cCount > 0)
-                    {
-                        await TreasureAdjustmentSingle(currentDelver, 2);
-                    }
-                    // favored bonus
-                    if(currentDelver.favored)
-                    {
-                        await TreasureAdjustmentSingle(currentDelver, 1);
-                    }
-                    break;
-                }
-            // sneak down the middle
-            case 1:
-                {
-                    // give treasures if others went down the other paths
-                    if(aCount > 0 && cCount > 0)
+                    if(eastCount > 0 && northCount > 0)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 2);
                     }
@@ -54,15 +41,30 @@ public class Hive : ScenarioScript
                     break;
                 }
             // sneak right
-            case 2:
+            case optionDirections.East:
                 {
                     // give treasures if others went down the other paths
-                    if(aCount > 0 && bCount > 0)
+                    if(westCount > 0 && eastCount > 0)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 2);
                     }
                     // favored bonus
                     if(currentDelver.favored)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 1);
+                    }
+                    break;
+                }
+            // sneak down the middle
+            case optionDirections.North:
+                {
+                    // give treasures if others went down the other paths
+                    if (westCount > 0 && northCount > 0)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 2);
+                    }
+                    // favored bonus
+                    if (currentDelver.favored)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 1);
                     }

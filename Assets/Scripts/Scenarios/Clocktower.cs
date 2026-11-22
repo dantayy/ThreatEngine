@@ -9,14 +9,15 @@ public class Clocktower : ScenarioScript
     public Clocktower()
     {
         scenarioTitle = "The Clocktower";
+        SetActionCount(2);
 
-        actionTitles.Add("Knock the Bell");
-        actionTitles.Add("Align the Gears to Unlock a Path");
-
-        actionEffects.Add("+20 IF no one carries the spirit's favor. [+5]");
-        actionEffects.Add("+ points equal to the sum of digits in the minute portion of the time when the player resolves their turn. [+1]");
-
-        lateGame = true;
+        // West
+        actionTitles[(int)optionDirections.West] = "Knock the Bell";
+        actionEffects[(int)optionDirections.West] = "+20 IF no one carries the spirit's favor. [+5]";
+        
+        // East
+        actionTitles[(int)optionDirections.East] = "Align the Gears to Unlock a Path";
+        actionEffects[(int)optionDirections.East] = "+ points equal to the sum of digits in the minute portion of the time when the player resolves their turn. [+1]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -24,8 +25,22 @@ public class Clocktower : ScenarioScript
         // handle each possible action choice
         switch (currentDelver.actionIdx)
         {
+            // align the gears to unlock a path
+            case optionDirections.West:
+                {
+                    // grab current time
+                    currentTime = DateTime.Now;
+                    // calculate sum of the two minute digits, then add to current delver's treasures
+                    await TreasureAdjustmentSingle(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
+                    // add extra treasures if favored
+                    if(currentDelver.favored)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 1);
+                    }
+                    break;
+                }
             // knock the bell
-            case 0:
+            case optionDirections.East:
                 {
                     // only give points if no delver is favored
                     if(!delverFavored)
@@ -36,20 +51,6 @@ public class Clocktower : ScenarioScript
                     else if(currentDelver.favored)
                     {
                         await TreasureAdjustmentSingle(currentDelver, 5);
-                    }
-                    break;
-                }
-            // align the gears to unlock a path
-            case 1:
-                {
-                    // grab current time
-                    currentTime = DateTime.Now;
-                    // calculate sum of the two minute digits, then add to current delver's treasures
-                    await TreasureAdjustmentSingle(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
-                    // add extra treasures if favored
-                    if(currentDelver.favored)
-                    {
-                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
                     break;
                 }

@@ -15,7 +15,7 @@ public class PlayerScript : MonoBehaviour
     // flag set when the delver is favored by the spirit
     public bool favored = false;
     // action delver is choosing in a scenario
-    public int actionIdx = -1;
+    public optionDirections actionIdx = optionDirections.None;
     // reference to previous delver in turn order
     public PlayerScript leftDelver;
     // reference to next delver in turn order
@@ -53,7 +53,7 @@ public class PlayerScript : MonoBehaviour
     // Reset all values related to choices a player makes during a round
     public void ClearChoices()
     {
-        actionIdx = -1;
+        actionIdx = optionDirections.None;
         target = null;
         callToSpirit = false;
         spiritBribe = 0;

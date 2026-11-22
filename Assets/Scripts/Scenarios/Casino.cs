@@ -8,14 +8,18 @@ public class Casino : ScenarioScript
     public Casino()
     {
         scenarioTitle = "The Casino";
+        SetActionCount(3);
 
-        actionTitles.Add("Blackjack by the books");
-        actionTitles.Add("Roulette");
-        actionTitles.Add("All in on poker");
+        actionTitles[(int)optionDirections.West] = "Blackjack by the books";
+        actionEffects[(int)optionDirections.West] = "+5 [+3]";
 
-        actionEffects.Add("+5 [+3]");
-        actionEffects.Add("Random delver [Pick a delver instead] loses all treasures.");
-        actionEffects.Add("Flip a coin. [Flip two coins instead and use either result.] Heads: Double your treasures. Tails: Lose all your treasures.");
+        // East
+        actionTitles[(int)optionDirections.East] = "All in on poker";
+        actionEffects[(int)optionDirections.East] = "Flip a coin. [Flip two coins instead and use either result.] Heads: Double your treasures. Tails: Lose all your treasures.";
+
+        // North
+        actionTitles[(int)optionDirections.North] = "Roulette";
+        actionEffects[(int)optionDirections.North] = "Random delver [Pick a delver instead] loses all treasures.";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -24,7 +28,7 @@ public class Casino : ScenarioScript
         switch (currentDelver.actionIdx)
         {
             // blackjack
-            case 0:
+            case optionDirections.West:
                 {
                     // add to delver's treasures
                     await TreasureAdjustmentSingle(currentDelver, 5);
@@ -36,25 +40,8 @@ public class Casino : ScenarioScript
                     }
                     break;
                 }
-            // roulette
-            case 1:
-                {
-                    // favored bonus
-                    if (currentDelver.favored)
-                    {
-                        // target delver loses all treasures
-                        await TreasureAdjustmentSingle(currentDelver.target, -currentDelver.target.treasures);
-                        break;
-                    }
-
-                    // random delver loses all treasures
-                    PlayerScript randomDelver = delversSortedScores[Random.Range(0, delversSortedScores.Count)];
-                    await ChooseRandomDelver(delversSortedScores, randomDelver);
-                    await TreasureAdjustmentSingle(randomDelver, -randomDelver.treasures);
-                    break;
-                }
             // poker
-            case 2:
+            case optionDirections.East:
                 {
                     // flip a coin
                     bool wonCoinFlip = Random.value > 0.5f;
@@ -78,6 +65,23 @@ public class Casino : ScenarioScript
                     await TreasureAdjustmentSingle(currentDelver, -currentDelver.treasures);
                     break;
 
+                }
+            // roulette
+            case optionDirections.North:
+                {
+                    // favored bonus
+                    if (currentDelver.favored)
+                    {
+                        // target delver loses all treasures
+                        await TreasureAdjustmentSingle(currentDelver.target, -currentDelver.target.treasures);
+                        break;
+                    }
+
+                    // random delver loses all treasures
+                    PlayerScript randomDelver = delversSortedScores[Random.Range(0, delversSortedScores.Count)];
+                    await ChooseRandomDelver(delversSortedScores, randomDelver);
+                    await TreasureAdjustmentSingle(randomDelver, -randomDelver.treasures);
+                    break;
                 }
             default:
                 break;
