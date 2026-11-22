@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.Multiplayer.Center.Common;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TrapChamber", menuName = "Scriptable Objects/TrapChamber")]
@@ -9,13 +8,13 @@ public class TrapChamber : ScenarioScript
     public TrapChamber()
     {
         scenarioTitle = "The Trap Chamber";
-        
-        actionTitles.Add("Lose a finger");
-        actionTitles.Add("Burned alive");
+        SetActionCount(2);
 
-        actionEffects.Add("-1 [+2]");
-        actionEffects.Add("-3 OR +4 IF all delvers pick this [+1 OR +6 IF all delvers pick this]");
+        actionTitles[(int)optionDirections.West] = "Lose a finger";
+        actionEffects[(int)optionDirections.West] = "-1 [Then +2]";
 
+        actionTitles[(int)optionDirections.East] = "Burned alive";
+        actionEffects[(int)optionDirections.East] = "-3 OR +4 IF all delvers pick this. [Then +1 OR +6 IF all delvers pick this.]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -24,7 +23,7 @@ public class TrapChamber : ScenarioScript
         switch (currentDelver.actionIdx)
         {
             // lose a finger
-            case 0:
+            case optionDirections.West:
                 {
                     await TreasureAdjustmentSingle(currentDelver, -1);
                     if(currentDelver.favored)
@@ -34,10 +33,10 @@ public class TrapChamber : ScenarioScript
                     break;
                 }
             // burned alive
-            case 1:
+            case optionDirections.East:
                 {
                     // more treasures if all delvers take on the fire together
-                    if(aCount == 0)
+                    if(westCount == 0)
                     {
                         await ConditionResult(true);
                         await TreasureAdjustmentSingle(currentDelver, 4);

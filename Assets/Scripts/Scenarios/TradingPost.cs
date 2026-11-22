@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 [CreateAssetMenu(fileName = "TradingPost", menuName = "Scriptable Objects/TradingPost")]
 public class TradingPost : ScenarioScript
@@ -9,12 +8,13 @@ public class TradingPost : ScenarioScript
     public TradingPost()
     {
         scenarioTitle = "The Trading Post";
+        SetActionCount(2);
 
-        actionTitles.Add("Pillage");
-        actionTitles.Add("Trade");
+        actionTitles[(int)optionDirections.West] = "Pillage";
+        actionEffects[(int)optionDirections.West] = "+5 [Then +3]";
 
-        actionEffects.Add("+5 [+3]");
-        actionEffects.Add("Pick a delver. Swap points with them. [Then +4]");
+        actionTitles[(int)optionDirections.East] = "Trade";
+        actionEffects[(int)optionDirections.East] = "Pick a delver. Swap points with them. [Then +4]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -23,7 +23,7 @@ public class TradingPost : ScenarioScript
         switch (currentDelver.actionIdx)
         {
             // pillage
-            case 0:
+            case optionDirections.West:
                 {
                     await TreasureAdjustmentSingle(currentDelver, 5);
 
@@ -35,7 +35,7 @@ public class TradingPost : ScenarioScript
                     break;
                 }
             // trade
-            case 1:
+            case optionDirections.East:
                 {
                     await SwapTreasures(currentDelver, currentDelver.target);
 

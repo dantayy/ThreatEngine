@@ -8,14 +8,16 @@ public class PickPocketPavillion : ScenarioScript
     public PickPocketPavillion()
     {
         scenarioTitle = "The Pickpocket Pavillion";
+        SetActionCount(3);
 
-        actionTitles.Add("Scoop loot from the fountain");
-        actionTitles.Add("Hit and run");
-        actionTitles.Add("Make room for bigger treasures");
+        actionTitles[(int)optionDirections.West] = "Scoop loot from the fountain";
+        actionEffects[(int)optionDirections.West] = "+3 [Then +3]";
+        
+        actionTitles[(int)optionDirections.East] = "Make room for bigger treasures";
+        actionEffects[(int)optionDirections.East] = "+4 [then +2] per player who steals from you.";
 
-        actionEffects.Add("+3 [+3]");
-        actionEffects.Add("Pick a player. Steal 2 from them. [Steal 1 from all other opponents.]");
-        actionEffects.Add("+4 [+2] per player who steals from you.");
+        actionTitles[(int)optionDirections.North] = "Hit and run";
+        actionEffects[(int)optionDirections.North] = "Pick a player. Steal 2 from them. [Then steal 1 from your other opponents.]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
@@ -24,7 +26,7 @@ public class PickPocketPavillion : ScenarioScript
         switch (currentDelver.actionIdx)
         {
             // scoop loot from the fountain
-            case 0:
+            case optionDirections.West:
                 {
                     // add to delver's treasures
                     await TreasureAdjustmentSingle(currentDelver, 3);
@@ -36,8 +38,26 @@ public class PickPocketPavillion : ScenarioScript
                     }
                     break;
                 }
+            // make room for bigger treasures
+            case optionDirections.East:
+                // determine who has stolen from this delver
+                foreach (PlayerScript potentialThief in delversSortedScores)
+                {
+                    if (potentialThief.target == currentDelver)
+                    {
+                        // add treasures when stolen from
+                        await TreasureAdjustmentSingle(currentDelver, 4);
+                        // favored bonus
+                        if (currentDelver.favored)
+                        {
+                            // add to delver's treasures
+                            await TreasureAdjustmentSingle(currentDelver, 2);
+                        }
+                    }
+                }
+                break;
             // hit and run
-            case 1:
+            case optionDirections.North:
                 {
                     // steal treasures from target
                     await StealTreasuresSingle(currentDelver, currentDelver.target, 2);
@@ -62,24 +82,6 @@ public class PickPocketPavillion : ScenarioScript
                     }
                     break;
                 }
-            // make room for bigger treasures
-            case 2:
-                // determine who has stolen from this delver
-                foreach (PlayerScript potentialThief in delversSortedScores)
-                {
-                    if (potentialThief.target == currentDelver)
-                    {
-                        // add treasures when stolen from
-                        await TreasureAdjustmentSingle(currentDelver, 4);
-                        // favored bonus
-                        if (currentDelver.favored)
-                        {
-                            // add to delver's treasures
-                            await TreasureAdjustmentSingle(currentDelver, 2);
-                        }
-                    }
-                }
-                break;
             default:
                 break;
         }

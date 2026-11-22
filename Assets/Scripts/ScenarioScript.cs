@@ -6,19 +6,26 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 
+// Sets the order of the cardinal directions
+public enum optionDirections
+{
+    None = -1,
+    West = 0,
+    East = 1,
+    North = 2,
+    South = 3,
+}
+
 [CreateAssetMenu(fileName = "ScenarioScript", menuName = "Scriptable Objects/ScenarioScript")]
 public abstract class ScenarioScript : ScriptableObject
 {
     // flavorful name of the scenario delvers have to overcome
     [field: SerializeField] public string scenarioTitle;
     // flavorful titles of the actions that can be taken in this scenario that will affect scores
-    [System.NonSerialized] public List<string> actionTitles = new List<string>();
+    [System.NonSerialized] public string[] actionTitles;
     // mechanical descriptions of the outcomes of the actions being selected
     // TODO: use something other than the string type so we can write with more than plaintext
-    [System.NonSerialized] public List<string> actionEffects = new List<string>();
-    // flags set to consider a scenario as either early-game or late-game
-    [field: SerializeField] public bool earlyGame = false;
-    [field: SerializeField] public bool lateGame = false;
+    [System.NonSerialized] public string[] actionEffects;
 
     // events
     public static event Func<PlayerScript, int, Task> OnTreasuresAdded;
@@ -36,53 +43,62 @@ public abstract class ScenarioScript : ScriptableObject
 
     // delver having their scenario action resolved
     protected PlayerScript currentDelver;
+
     // count of each action being taken
-    protected int aCount = 0;
-    protected int bCount = 0;
-    protected int cCount = 0;
-    protected int dCount = 0;
+    protected int westCount = 0;
+    protected int eastCount = 0;
+    protected int northCount = 0;
+    protected int southCount = 0;
     // time for clocktower
     protected DateTime currentTime;
     // flag set when a delver is favored by the spirit
-    protected bool delverFavored;
+    protected bool aFavoredDelverExists;
+    protected PlayerScript delverGoingFirst;
+
+    protected List<PlayerScript> delversInTurnOrder;
+
+    protected List<GameStateScript> gameStateHistory;
 
     // resolve scenario
-    public async Task ScenarioResolution(List<PlayerScript> delvers, PlayerScript delverGoingFirst)
+    public async Task ScenarioResolution(List<PlayerScript> delvers, PlayerScript currentFirstDelver, List<GameStateScript> currentHistory)
     {
         Debug.Log("Resolving spirit calls");
         await SpiritCallingResolutions(delvers);
         Debug.Log("Resolving actions for " + name);
         // reset the main tracker vars
-        currentDelver = delverGoingFirst;
-        aCount = 0;
-        bCount = 0;
-        cCount = 0;
-        dCount = 0;
-        delverFavored = false;
+        currentDelver = currentFirstDelver;
+        delverGoingFirst = currentFirstDelver;
+        delversInTurnOrder = delvers;
+        westCount = 0;
+        eastCount = 0;
+        northCount = 0;
+        southCount = 0;
+        aFavoredDelverExists = false;
+        gameStateHistory = currentHistory;
         // perform initial pass of delver choices to set trackers up
         foreach(PlayerScript delver in delvers)
         {
             // set favored flag
             if(delver.favored)
             {
-                delverFavored = true;
+                aFavoredDelverExists = true;
             }
             // increment choice tracker
-            if(delver.actionIdx == 0)
+            if(delver.actionIdx == optionDirections.West)
             {
-                aCount++;
+                westCount++;
             }
-            else if(delver.actionIdx == 1)
+            else if(delver.actionIdx == optionDirections.East)
             {
-                bCount++;
+                eastCount++;
             }
-            else if(delver.actionIdx == 2)
+            else if(delver.actionIdx == optionDirections.North)
             {
-                cCount++;
+                northCount++;
             }
-            else if(delver.actionIdx == 3)
+            else if(delver.actionIdx == optionDirections.South)
             {
-                dCount++;
+                southCount++;
             }
         }
         // perform unique actions based on the child class' implementation until all delvers have had their actions resolved
@@ -220,6 +236,13 @@ public abstract class ScenarioScript : ScriptableObject
     protected virtual async Task ActionResolutions(List<PlayerScript> delverSortedScores)
     {
         await Task.CompletedTask;
+    }
+
+    // set up arrays based on the number of available actions in the scenario.
+    protected void SetActionCount(int actionCount)
+    {
+        actionTitles = new string[actionCount];
+        actionEffects = new string[actionCount];
     }
 
     // Version of treasureAdjustments that takes in a single delver for convenience.

@@ -8,12 +8,10 @@ public class Tesseract : ScenarioScript
     public Tesseract()
     {
         scenarioTitle = "The Tesseract";
-        
-        actionTitles.Add("Step forward in space, backward in time: ");
+        SetActionCount(1);
 
-        actionEffects.Add("Play the previous scenario again.");
-
-        lateGame = true;
+        actionTitles[(int)optionDirections.West] = "Step forward in space, backward in time: ";
+        actionEffects[(int)optionDirections.West] = "Play the previous scenario again.";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
