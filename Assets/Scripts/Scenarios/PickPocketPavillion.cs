@@ -8,91 +8,82 @@ public class PickPocketPavillion : ScenarioScript
     public PickPocketPavillion()
     {
         scenarioTitle = "The Pickpocket Pavillion";
+        SetActionCount(3);
 
-        actionTitles.Add("Scoop loot from the fountain");
-        actionTitles.Add("Hit and run");
-        actionTitles.Add("Make room for bigger treasures");
+        actionTitles[(int)optionDirections.West] = "Scoop loot from the fountain";
+        actionEffects[(int)optionDirections.West] = "+3 [Then +3]";
+        
+        actionTitles[(int)optionDirections.East] = "Make room for bigger treasures";
+        actionEffects[(int)optionDirections.East] = "+4 [then +2] per player who steals from you.";
 
-        actionEffects.Add("+3 [+3]");
-        actionEffects.Add("Pick a player. Steal 2 from them. [Steal 1 from all other opponents.]");
-        actionEffects.Add("+4 [+2] per player who steals from you.");
+        actionTitles[(int)optionDirections.North] = "Hit and run";
+        actionEffects[(int)optionDirections.North] = "Pick a player. Steal 2 from them. [Then steal 1 from your other opponents.]";
     }
 
-    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
-        // look at each delver's action choice
-        PlayerScript currentDelver = firstDelver;
-        do
+        // handle each possible action choice
+        switch (currentDelver.actionIdx)
         {
-            // handle each possible action choice
-            switch (currentDelver.actionIdx)
-            {
-                // scoop loot from the fountain
-                case 0:
+            // scoop loot from the fountain
+            case optionDirections.West:
+                {
+                    // add to delver's treasures
+                    await TreasureAdjustmentSingle(currentDelver, 3);
+                    // favored bonus
+                    if (currentDelver.favored)
                     {
                         // add to delver's treasures
-                        await TreasureAdjustment(currentDelver, 3);
+                        await TreasureAdjustmentSingle(currentDelver, 3);
+                    }
+                    break;
+                }
+            // make room for bigger treasures
+            case optionDirections.East:
+                // determine who has stolen from this delver
+                foreach (PlayerScript potentialThief in delversSortedScores)
+                {
+                    if (potentialThief.target == currentDelver)
+                    {
+                        // add treasures when stolen from
+                        await TreasureAdjustmentSingle(currentDelver, 4);
                         // favored bonus
                         if (currentDelver.favored)
                         {
                             // add to delver's treasures
-                            await TreasureAdjustment(currentDelver, 3);
+                            await TreasureAdjustmentSingle(currentDelver, 2);
                         }
-                        break;
                     }
-                // hit and run
-                case 1:
+                }
+                break;
+            // hit and run
+            case optionDirections.North:
+                {
+                    // steal treasures from target
+                    await StealTreasuresSingle(currentDelver, currentDelver.target, 2);
+
+                    // favored bonus
+                    if (currentDelver.favored)
                     {
-                        // add to delver's treasures
-                        await TreasureAdjustment(currentDelver, 2);
-                        // take from target's treasures
-                        await TreasureAdjustment(currentDelver.target, -2);
-                        // favored bonus
-                        if (currentDelver.favored)
+                        List<PlayerScript> affectedDelvers = new List<PlayerScript>();
+
+                        // take from every other player
+                        foreach (PlayerScript target in delversSortedScores)
                         {
-                            // add treasures for every other player
-                            await TreasureAdjustment(currentDelver, delversSortedScores.Count - 2);
-                            // take from every other player
-                            foreach (PlayerScript target in delversSortedScores)
+                            if (
+                                target.delverID != currentDelver.delverID &&
+                                target.delverID != currentDelver.target.delverID
+                            )
                             {
-                                if (
-                                    target.delverID != currentDelver.delverID &&
-                                    target.delverID != currentDelver.target.delverID
-                                )
-                                {
-                                    await TreasureAdjustment(target, -1);
-                                }
+                                affectedDelvers.Add(target);
                             }
                         }
-                        break;
-                    }
-                // make room for bigger treasures
-                case 2:
-                    // determine who has stolen from this delver
-                    foreach (PlayerScript potentialThief in delversSortedScores)
-                    {
-                        if (potentialThief.target == currentDelver)
-                        {
-                            // add treasures when stolen from
-                            await TreasureAdjustment(currentDelver, 4);
-                            // favored bonus
-                            if (currentDelver.favored)
-                            {
-                                // add to delver's treasures
-                                await TreasureAdjustment(currentDelver, 2);
-                            }
-                        }
+                        await StealTreasures(currentDelver, affectedDelvers, 1);
                     }
                     break;
-                default:
-                    break;
-            }
-
-            // re-sort delver scores list
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-            // move to next delver in turn order
-            currentDelver = currentDelver.rightDelver;
-        } while (currentDelver != firstDelver);
+                }
+            default:
+                break;
+        }
     }
 }

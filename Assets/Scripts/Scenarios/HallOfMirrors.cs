@@ -8,120 +8,87 @@ public class HallOfMirrors : ScenarioScript
     public HallOfMirrors()
     {
         scenarioTitle = "The Hall Of Mirrors";
-        
-        actionTitles.Add("Listen for the spirit's guidance");
-        actionTitles.Add("Take your time");
-        actionTitles.Add("Look for a trail to follow");
-        actionTitles.Add("Cannonball run");
+        SetActionCount(4);
 
-        actionEffects.Add("+1 IF only you pick this [+3]");
-        actionEffects.Add("+2 IF only you pick this [+2]");
-        actionEffects.Add("+3 IF only you pick this [+1]");
-        actionEffects.Add("+4 IF only you pick this [+0]");
+        // West
+        actionTitles[(int)optionDirections.West] = "Listen for the spirit's guidance";
+        actionEffects[(int)optionDirections.West] = "+1 IF only you pick this [Then +3]";
 
-        earlyGame = true;
+        // East
+        actionTitles[(int)optionDirections.East] = "Take your time";
+        actionEffects[(int)optionDirections.East] = "+2 IF only you pick this [Then +2]";
+
+        // North
+        actionTitles[(int)optionDirections.North] = "Look for a trail to follow";
+        actionEffects[(int)optionDirections.North] = "+3 IF only you pick this [Then +1]";
+
+        // South
+        actionTitles[(int)optionDirections.South] = "Cannonball run";
+        actionEffects[(int)optionDirections.South] = "+4 IF only you pick this [Then +0]";
     }
 
-    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
-        // vars for tracking how many delvers went each way
-        int a = 0;
-        int b = 0;
-        int c = 0;
-        int d = 0;
-
-        // perform initial pass of delver choices to determine how many went left and how many went right
-        foreach(PlayerScript delver in delversSortedScores)
+        // handle each possible action choice
+        switch (currentDelver.actionIdx)
         {
-            if(delver.actionIdx == 0)
-            {
-                a++;
-            }
-            else if(delver.actionIdx == 1)
-            {
-                b++;
-            }
-            else if(delver.actionIdx == 2)
-            {
-                c++;
-            }
-            else if(delver.actionIdx == 3)
-            {
-                d++;
-            }
-        }
-
-        // look at each delver's action choice
-        PlayerScript currentDelver = firstDelver;
-        do
-        {
-            // handle each possible action choice
-            switch (currentDelver.actionIdx)
-            {
-                // listen for the spirit's guidance
-                case 0:
+            // listen for the spirit's guidance
+            case optionDirections.West:
+                {
+                    // give treasures if exclusive
+                    if(westCount == 1)
                     {
-                        // give treasures if exclusive
-                        if(a == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 1);
-                        }
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 3);
-                        }
-                        break;
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
-                // take your time
-                case 1:
+                    // favored bonus
+                    if(currentDelver.favored)
                     {
-                        // give treasures if exclusive
-                        if(b == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 2);
-                        }
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 2);
-                        }
-                        break;
+                        await TreasureAdjustmentSingle(currentDelver, 3);
                     }
-                // look for a trail to follow
-                case 2:
-                    {
-                        // give treasures if exclusive
-                        if(c == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 3);
-                        }
-                        // favored bonus
-                        if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 1);
-                        }
-                        break;
-                    }
-                // cannonball run
-                case 3:
-                    {
-                        // give treasures if exclusive
-                        if(d == 1)
-                        {
-                            await TreasureAdjustment(currentDelver, 4);
-                        }
-                        break;
-                    }
-                default:
                     break;
-            }
-
-            // re-sort delver scores list
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-            // move to next delver in turn order
-            currentDelver = currentDelver.rightDelver;
-        } while (currentDelver != firstDelver);
+                }
+            // take your time
+            case optionDirections.East:
+                {
+                    // give treasures if exclusive
+                    if(eastCount == 1)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 2);
+                    }
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 2);
+                    }
+                    break;
+                }
+            // look for a trail to follow
+            case optionDirections.North:
+                {
+                    // give treasures if exclusive
+                    if(northCount == 1)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 3);
+                    }
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 1);
+                    }
+                    break;
+                }
+            // cannonball run
+            case optionDirections.South:
+                {
+                    // give treasures if exclusive
+                    if(southCount == 1)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 4);
+                    }
+                    break;
+                }
+            default:
+                break;
+        }
     }
 }

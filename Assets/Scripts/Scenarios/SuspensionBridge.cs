@@ -8,93 +8,68 @@ public class SuspensionBridge : ScenarioScript
     public SuspensionBridge()
     {
         scenarioTitle = "The Suspension Bridge";
-        
-        actionTitles.Add("Walk on the left");
-        actionTitles.Add("Walk on the right");
+        SetActionCount(2);
 
-        actionEffects.Add("+1 per delver who picked B [+1 OR +4 IF every other delver picks B]");
-        actionEffects.Add("+1 per delver who picked A [+1 OR +4 IF every other delver picks A]");
+        actionTitles[(int)optionDirections.West] = "Walk on the left";
+        actionEffects[(int)optionDirections.West] = "+1 per delver who picked B [Then +1 OR +4 IF every other delver picks B]";
 
-        earlyGame = true;
+        actionTitles[(int)optionDirections.East] = "Walk on the right";
+        actionEffects[(int)optionDirections.East] = "+1 per delver who picked A [Then +1 OR +4 IF every other delver picks A]";
     }
 
-    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
-        // vars for tracking how many delvers went each way
-        int leftCount = 0;
-        int rightCount = 0;
-
-        // perform initial pass of delver choices to determine how many went left and how many went right
-        foreach(PlayerScript delver in delversSortedScores)
+        // handle each possible action choice
+        switch (currentDelver.actionIdx)
         {
-            if(delver.actionIdx == 0)
-            {
-                leftCount++;
-            }
-            else if(delver.actionIdx == 1)
-            {
-                rightCount++;
-            }
-        }
-
-        // look at each delver's action choice
-        PlayerScript currentDelver = firstDelver;
-        do
-        {
-            // handle each possible action choice
-            switch (currentDelver.actionIdx)
-            {
-                // walk on the left
-                case 0:
+            // walk on the left
+            case optionDirections.West:
+                {
+                    // treasures for every delver going on the other side
+                    await TreasureAdjustmentSingle(currentDelver, eastCount);
+                    // favored bonus
+                    if(currentDelver.favored)
                     {
-                        // treasures for every delver going on the other side
-                        await TreasureAdjustment(currentDelver, rightCount);
-                        // favored bonus
-                        if(currentDelver.favored)
+                        // extra bonus if everyone else went right
+                        if(westCount == 1)
                         {
-                            // extra bonus if everyone else went right
-                            if(leftCount == 1)
-                            {
-                                await TreasureAdjustment(currentDelver, 4);
-                            }
-                            // default bonus
-                            else
-                            {
-                                await TreasureAdjustment(currentDelver, 1);
-                            }
+                            await ConditionResult(true);
+                            await TreasureAdjustmentSingle(currentDelver, 4);
                         }
-                        break;
-                    }
-                // walk on the right
-                case 1:
-                    {
-                        // treasures for every delver going on the other side
-                        await TreasureAdjustment(currentDelver, leftCount);
-                        // favored bonus
-                        if(currentDelver.favored)
+                        // default bonus
+                        else
                         {
-                            // extra bonus if everyone else went left
-                            if(rightCount == 1)
-                            {
-                                await TreasureAdjustment(currentDelver, 4);
-                            }
-                            // default bonus
-                            else
-                            {
-                                await TreasureAdjustment(currentDelver, 1);
-                            }
+                            await ConditionResult(false);
+                            await TreasureAdjustmentSingle(currentDelver, 1);
                         }
-                        break;
                     }
-                default:
                     break;
-            }
-
-            // re-sort delver scores list
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-            // move to next delver in turn order
-            currentDelver = currentDelver.rightDelver;
-        } while (currentDelver != firstDelver);
+                }
+            // walk on the right
+            case optionDirections.East:
+                {
+                    // treasures for every delver going on the other side
+                    await TreasureAdjustmentSingle(currentDelver, westCount);
+                    // favored bonus
+                    if(currentDelver.favored)
+                    {
+                        // extra bonus if everyone else went left
+                        if(eastCount == 1)
+                        {
+                            await ConditionResult(true);
+                            await TreasureAdjustmentSingle(currentDelver, 4);
+                        }
+                        // default bonus
+                        else
+                        {
+                            await ConditionResult(false);
+                            await TreasureAdjustmentSingle(currentDelver, 1);
+                        }
+                    }
+                    break;
+                }
+            default:
+                break;
+        }
     }
 }

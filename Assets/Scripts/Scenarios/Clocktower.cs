@@ -9,81 +9,51 @@ public class Clocktower : ScenarioScript
     public Clocktower()
     {
         scenarioTitle = "The Clocktower";
+        SetActionCount(2);
 
-        actionTitles.Add("Knock the Bell");
-        actionTitles.Add("Align the Gears to Unlock a Path");
+        actionTitles[(int)optionDirections.West] = "Knock the Bell";
+        actionEffects[(int)optionDirections.West] = "+20 IF no one carries the spirit's favor. [Then +5]";
 
-        actionEffects.Add("+20 IF no one carries the spirit's favor. [+5]");
-        actionEffects.Add("+ points equal to the sum of digits in the minute portion of the time when the player resolves their turn. [+1]");
-
-        lateGame = true;
+        actionTitles[(int)optionDirections.East] = "Align the Gears to Unlock a Path";
+        actionEffects[(int)optionDirections.East] = "+treasures equal to the sum of digits in the minute portion of the time when the player resolves their turn. [Then +1]";
     }
 
-    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores, PlayerScript firstDelver)
+    protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
     {
-        // flag set when any delver is favored this round
-        bool favored = false;
-        // flag set when we've completed our single check of delvers for favored status
-        bool favoredChecked = false;
-        // current time var
-        DateTime currentTime;
-        // look at each delver's action choice
-        PlayerScript currentDelver = firstDelver;
-        do
+        // handle each possible action choice
+        switch (currentDelver.actionIdx)
         {
-            // handle each possible action choice
-            switch (currentDelver.actionIdx)
-            {
-                // knock the bell
-                case 0:
+            // align the gears to unlock a path
+            case optionDirections.West:
+                {
+                    // grab current time
+                    currentTime = DateTime.Now;
+                    // calculate sum of the two minute digits, then add to current delver's treasures
+                    await TreasureAdjustmentSingle(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
+                    // add extra treasures if favored
+                    if(currentDelver.favored)
                     {
-                        // check all delvers once for favored status
-                        if(!favoredChecked)
-                        {
-                            foreach (PlayerScript target in delversSortedScores)
-                            {
-                                // a delver is favored, set flag and break out
-                                if(target.favored)
-                                {
-                                    favored = true;
-                                    break;
-                                }
-                            }
-                            favoredChecked = true;
-                        }
-                        // only give points if no delver is favored
-                        if(!favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 20);
-                        }
-                        // add extra treasures if favored
-                        else if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 5);
-                        }
-                        break;
+                        await TreasureAdjustmentSingle(currentDelver, 1);
                     }
-                // align the gears to unlock a path
-                case 1:
+                    break;
+                }
+            // knock the bell
+            case optionDirections.East:
+                {
+                    // only give points if no delver is favored
+                    if(!aFavoredDelverExists)
                     {
-                        // grab current time
-                        currentTime = DateTime.Now;
-                        // calculate sum of digits in gear, then add to current delver's treasures
-                        await TreasureAdjustment(currentDelver, currentTime.Minute % 10 + ((currentTime.Minute - currentTime.Minute % 10) / 10));
-                        // add extra treasures if favored
-                        if(currentDelver.favored)
-                        {
-                            await TreasureAdjustment(currentDelver, 1);
-                        }
-                        break;
+                        await TreasureAdjustmentSingle(currentDelver, 20);
                     }
-            }
-
-            // re-sort delver scores list
-            delversSortedScores.Sort((a,b) => a.treasures.CompareTo(b.treasures));
-
-            // move to next delver in turn order
-            currentDelver = currentDelver.rightDelver;
-        } while (currentDelver != firstDelver);
+                    // add extra treasures if favored
+                    else if(currentDelver.favored)
+                    {
+                        await TreasureAdjustmentSingle(currentDelver, 5);
+                    }
+                    break;
+                }
+            default:
+                break;
+        }
     }
 }
