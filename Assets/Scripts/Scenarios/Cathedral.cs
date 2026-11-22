@@ -11,13 +11,13 @@ public class Cathedral : ScenarioScript
         SetActionCount(3);
 
         actionTitles[(int)optionDirections.West] = "Pray alone";
-        actionEffects[(int)optionDirections.West] = "+5 [+3] IF only you choose this";
+        actionEffects[(int)optionDirections.West] = "+5 [then +3] IF only you choose this";
         
         actionTitles[(int)optionDirections.East] = "Take from the offering bin";
-        actionEffects[(int)optionDirections.East] = "+1 [+2]";
+        actionEffects[(int)optionDirections.East] = "+1 [then +2]";
 
         actionTitles[(int)optionDirections.North] = "Break the marble effigy together";
-        actionEffects[(int)optionDirections.North] = "+4 [+2] IF everyone chooses this";
+        actionEffects[(int)optionDirections.North] = "+4 [then +2] IF everyone chooses this";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)

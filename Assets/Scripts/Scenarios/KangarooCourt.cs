@@ -12,16 +12,16 @@ public class KangarooCourt : ScenarioScript
         SetActionCount(4);
 
         actionTitles[(int)optionDirections.West] = "Trapped in the holding cell";
-        actionEffects[(int)optionDirections.West] = "-3 [0]";
+        actionEffects[(int)optionDirections.West] = "-3 [+0 instead]";
         
         actionTitles[(int)optionDirections.East] = "Destroy the scale";
-        actionEffects[(int)optionDirections.East] = "+3 to all delvers not in first or last place [Steal 3 from them instead]";
+        actionEffects[(int)optionDirections.East] = "+3 to all delvers not in first or last place. [Steal 3 from them instead.]";
         
         actionTitles[(int)optionDirections.North] = "Balance the scale";
-        actionEffects[(int)optionDirections.North] = "+5 for last place delver(s) [+3]";
+        actionEffects[(int)optionDirections.North] = "+5 for last place delver(s) [Then +3]";
         
         actionTitles[(int)optionDirections.South] = "Unbalance the scale";
-        actionEffects[(int)optionDirections.South] = "-5 for first place delver(s) [+5]";
+        actionEffects[(int)optionDirections.South] = "-5 for first place delver(s) [Then +5]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)

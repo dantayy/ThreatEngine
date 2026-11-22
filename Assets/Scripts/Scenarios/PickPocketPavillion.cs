@@ -11,13 +11,13 @@ public class PickPocketPavillion : ScenarioScript
         SetActionCount(3);
 
         actionTitles[(int)optionDirections.West] = "Scoop loot from the fountain";
-        actionEffects[(int)optionDirections.West] = "+3 [+3]";
+        actionEffects[(int)optionDirections.West] = "+3 [Then +3]";
         
         actionTitles[(int)optionDirections.East] = "Make room for bigger treasures";
-        actionEffects[(int)optionDirections.East] = "+4 [+2] per player who steals from you.";
+        actionEffects[(int)optionDirections.East] = "+4 [then +2] per player who steals from you.";
 
         actionTitles[(int)optionDirections.North] = "Hit and run";
-        actionEffects[(int)optionDirections.North] = "Pick a player. Steal 2 from them. [Steal 1 from all other opponents.]";
+        actionEffects[(int)optionDirections.North] = "Pick a player. Steal 2 from them. [Then steal 1 from your other opponents.]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)

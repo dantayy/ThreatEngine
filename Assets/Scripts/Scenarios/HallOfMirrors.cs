@@ -12,19 +12,19 @@ public class HallOfMirrors : ScenarioScript
 
         // West
         actionTitles[(int)optionDirections.West] = "Listen for the spirit's guidance";
-        actionEffects[(int)optionDirections.West] = "+1 IF only you pick this [+3]";
+        actionEffects[(int)optionDirections.West] = "+1 IF only you pick this [Then +3]";
 
         // East
         actionTitles[(int)optionDirections.East] = "Take your time";
-        actionEffects[(int)optionDirections.East] = "+2 IF only you pick this [+2]";
+        actionEffects[(int)optionDirections.East] = "+2 IF only you pick this [Then +2]";
 
         // North
         actionTitles[(int)optionDirections.North] = "Look for a trail to follow";
-        actionEffects[(int)optionDirections.North] = "+3 IF only you pick this [+1]";
+        actionEffects[(int)optionDirections.North] = "+3 IF only you pick this [Then +1]";
 
         // South
         actionTitles[(int)optionDirections.South] = "Cannonball run";
-        actionEffects[(int)optionDirections.South] = "+4 IF only you pick this [+0]";
+        actionEffects[(int)optionDirections.South] = "+4 IF only you pick this [Then +0]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)

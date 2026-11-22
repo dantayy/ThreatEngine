@@ -13,11 +13,11 @@ public class Clocktower : ScenarioScript
 
         // West
         actionTitles[(int)optionDirections.West] = "Knock the Bell";
-        actionEffects[(int)optionDirections.West] = "+20 IF no one carries the spirit's favor. [+5]";
+        actionEffects[(int)optionDirections.West] = "+20 IF no one carries the spirit's favor. [Then +5]";
         
         // East
         actionTitles[(int)optionDirections.East] = "Align the Gears to Unlock a Path";
-        actionEffects[(int)optionDirections.East] = "+ points equal to the sum of digits in the minute portion of the time when the player resolves their turn. [+1]";
+        actionEffects[(int)optionDirections.East] = "+ points equal to the sum of digits in the minute portion of the time when the player resolves their turn. [Then +1]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)

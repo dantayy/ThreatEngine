@@ -11,7 +11,7 @@ public class Casino : ScenarioScript
         SetActionCount(3);
 
         actionTitles[(int)optionDirections.West] = "Blackjack by the books";
-        actionEffects[(int)optionDirections.West] = "+5 [+3]";
+        actionEffects[(int)optionDirections.West] = "+5 [Then +3]";
 
         // East
         actionTitles[(int)optionDirections.East] = "All in on poker";

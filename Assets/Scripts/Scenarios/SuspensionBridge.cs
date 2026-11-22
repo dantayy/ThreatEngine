@@ -11,10 +11,10 @@ public class SuspensionBridge : ScenarioScript
         SetActionCount(2);
 
         actionTitles[(int)optionDirections.West] = "Walk on the left";
-        actionEffects[(int)optionDirections.West] = "+1 per delver who picked B [+1 OR +4 IF every other delver picks B]";
+        actionEffects[(int)optionDirections.West] = "+1 per delver who picked B [Then +1 OR +4 IF every other delver picks B]";
 
         actionTitles[(int)optionDirections.East] = "Walk on the right";
-        actionEffects[(int)optionDirections.East] = "+1 per delver who picked A [+1 OR +4 IF every other delver picks A]";
+        actionEffects[(int)optionDirections.East] = "+1 per delver who picked A [Then +1 OR +4 IF every other delver picks A]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)

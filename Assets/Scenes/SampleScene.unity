@@ -5791,7 +5791,8 @@ MonoBehaviour:
   TimerText: {fileID: 25580792}
   playerTurnTime: 10
   discussionTime: 3
-  earlyScenarios: []
+  earlyScenarios:
+  - {fileID: 11400000, guid: a6d9e7e4a46d5814a8c2b3c34ccea662, type: 2}
   midScenarios: []
   lateScenarios: []
   optionDisplays:

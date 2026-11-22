@@ -11,13 +11,13 @@ public class Hive : ScenarioScript
         SetActionCount(3);
 
         actionTitles[(int)optionDirections.West] = "Sneak left";
-        actionEffects[(int)optionDirections.West] = "+2 IF North AND East are also picked. [+1]";
+        actionEffects[(int)optionDirections.West] = "+2 IF North AND East are also picked. [Then +1]";
         
         actionTitles[(int)optionDirections.East] = "Sneak right";
-        actionEffects[(int)optionDirections.East] = "+2 IF North AND West are also picked [+1]";
+        actionEffects[(int)optionDirections.East] = "+2 IF North AND West are also picked [Then +1]";
         
         actionTitles[(int)optionDirections.North] = "Sneak down the middle";
-        actionEffects[(int)optionDirections.North] = "+2 IF West AND East are also picked [+1]";
+        actionEffects[(int)optionDirections.North] = "+2 IF West AND East are also picked [Then +1]";
     }
 
     protected override async Task ActionResolutions(List<PlayerScript> delversSortedScores)
