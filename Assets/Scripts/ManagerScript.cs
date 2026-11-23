@@ -72,8 +72,8 @@ public class ManagerScript : MonoBehaviour
     List<GameStateScript> gameStateHistory;
 
     // events
-    public static event Func<ManagerScript, Task> OnRevealChoices;
-    public static event Func<ManagerScript, List<PlayerScript>, Task> OnActionResolutionCompleted;
+    public static event Func<Task> OnRevealChoices;
+    public static event Func<Task> OnActionResolutionCompleted;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -402,12 +402,12 @@ public class ManagerScript : MonoBehaviour
     async void ResolveTurn()
     {
         // reveal the choices made to all players
-        await OnRevealChoices?.Invoke(this);
+        await OnRevealChoices?.Invoke();
 
         // resolve the scenario
         await currentScenario.ScenarioResolution(delvers, firstDelver, gameStateHistory);
         List<PlayerScript> delversSortedByTreasures = delvers.OrderByDescending(obj => obj.treasures).ToList();
-        await OnActionResolutionCompleted?.Invoke(this, delversSortedByTreasures);
+        await OnActionResolutionCompleted?.Invoke();
 
 
         // set up game state record

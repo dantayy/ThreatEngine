@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class AnimationManagerScript : MonoBehaviour
 {
+    // game manager to reference delver assets with
+    [SerializeField]ManagerScript manager;
     // Visual depiction of the spirit
     [SerializeField] GameObject spiritPrefab;
     // Visual depiction of treasures for each delver
@@ -16,8 +18,6 @@ public class AnimationManagerScript : MonoBehaviour
     [SerializeField] List<GameObject> treasures2;
     [SerializeField] List<GameObject> treasures3;
     public List<List<GameObject>> treasureLists;
-    // canvas game is rendered on
-    [SerializeField] Canvas GameCanvas;
     // action options for scenarios
     [SerializeField] List<OptionScript> options;
     // image assets
@@ -29,7 +29,8 @@ public class AnimationManagerScript : MonoBehaviour
     [SerializeField] Sprite coinSide;
     [SerializeField] Sprite coinTails;
 
-    // game objects for delvers' icons
+    // delver assets
+    public List<PlayerScript> delvers;
     public List<GameObject> delverIcons;
 
      // multiplier for all animation speeds
@@ -40,6 +41,9 @@ public class AnimationManagerScript : MonoBehaviour
     {
         // create spirit prefab
         Instantiate(spiritPrefab);
+        // add delver assets from the manager
+        delvers = manager.delvers;
+        delverIcons = manager.delverIcons;
         // Add each delver's list of treasure objects to the main list
         treasureLists = new List<List<GameObject>>();
         treasureLists.AddRange(new List<List<GameObject>> { treasures0, treasures1, treasures2, treasures3 });
@@ -56,7 +60,8 @@ public class AnimationManagerScript : MonoBehaviour
         ManagerScript.OnRevealChoices += RevealPlayerChoices;
         ManagerScript.OnActionResolutionCompleted += CleanUpActionResolution;
         
-        ScenarioScript.OnActionResolutionBegan += ResetPlayerAndChoice;
+        ScenarioScript.OnResetDelvers += ResetPlayerAndChoice;
+        ScenarioScript.OnSpiritBribingBegan += RevealSpiritBribes;
         ScenarioScript.OnActionResolutionBegan += HighlightPlayerAndChoice;
         ScenarioScript.OnTreasuresAdded += AddTreasures;
         ScenarioScript.OnTreasuresRemoved += RemoveTreasures;
@@ -75,7 +80,8 @@ public class AnimationManagerScript : MonoBehaviour
         ManagerScript.OnRevealChoices -= RevealPlayerChoices;
         ManagerScript.OnActionResolutionCompleted -= CleanUpActionResolution;
 
-        ScenarioScript.OnActionResolutionBegan -= ResetPlayerAndChoice;
+        ScenarioScript.OnResetDelvers -= ResetPlayerAndChoice;
+        ScenarioScript.OnSpiritBribingBegan -= RevealSpiritBribes;
         ScenarioScript.OnActionResolutionBegan -= HighlightPlayerAndChoice;
         ScenarioScript.OnTreasuresAdded -= AddTreasures;
         ScenarioScript.OnTreasuresRemoved -= RemoveTreasures;
@@ -90,26 +96,32 @@ public class AnimationManagerScript : MonoBehaviour
     }
 
     // Center players who are interacting with the spirit
-    private async Task RevealSpiritCallings(ManagerScript gameManager)
+    private async Task RevealSpiritBribes()
     {
-        List<PlayerScript> delvers = gameManager.delvers;
-        List<GameObject> delverIcons = gameManager.delverIcons;
-
+        // animation task list for spirit calling
         List<Task> callingTasks = new List<Task>();
+        // temps for looping through icons
+        GameObject currentPlayerIcon;
+        // loop through delvers
         foreach(PlayerScript delver in delvers)
         {
-            int iconId = delver.delverID - 1;
-            GameObject currentPlayerIcon = delverIcons[iconId];
+            currentPlayerIcon = delverIcons[delver.delverID - 1];
+            // if bribed anything
+            if(delver.spiritBribe > 0)
+            {
+                // Animate the icons moving upward and becoming visible.
+                callingTasks.Add(currentPlayerIcon.GetComponent<CanvasGroup>().DOFade(1, 0.3f * animSpeedMultiplier).AsyncWaitForCompletion());
+                callingTasks.Add(currentPlayerIcon.transform.DOMoveY(currentPlayerIcon.transform.position.y + 100f, Random.Range(0.5f, 1f) * animSpeedMultiplier).AsyncWaitForCompletion());
+                // TODO: animate a spirit icon
+            }
         }
 
         await Task.WhenAll(callingTasks);
     }
 
     // Place player icons next to the choices they made.
-    private async Task RevealPlayerChoices(ManagerScript gameManager)
+    private async Task RevealPlayerChoices()
     {
-        List<PlayerScript> delvers = gameManager.delvers;
-        delverIcons = gameManager.delverIcons;
         int[] optionChosenCount = new int[options.Count];
 
         List<Task> choicesTasks = new List<Task>();
@@ -137,7 +149,7 @@ public class AnimationManagerScript : MonoBehaviour
     }
 
     // Highlight a player plaque and an option card.
-    private async Task HighlightPlayerAndChoice(List<PlayerScript> delvers, PlayerScript currentDelver)
+    private async Task HighlightPlayerAndChoice(PlayerScript currentDelver)
     {
         List<Task> highlightTasks = new List<Task>();
         Sequence highlightSequence = DOTween.Sequence();
@@ -151,10 +163,8 @@ public class AnimationManagerScript : MonoBehaviour
             {
                 highlightSequence.Join(delver.GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
                 highlightSequence.Join(delver.playerPlaque.GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
-                int iconId = delver.delverID - 1;
-                GameObject currentPlayerIcon = delverIcons[iconId];
-                highlightSequence.Join(currentPlayerIcon.GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
-                highlightSequence.Join(currentPlayerIcon.GetComponent<RectTransform>().DOScale(0.5f, 0.5f * animSpeedMultiplier));
+                highlightSequence.Join(delverIcons[delver.delverID - 1].GetComponent<CanvasGroup>().DOFade(0.5f, 0.5f * animSpeedMultiplier));
+                highlightSequence.Join(delverIcons[delver.delverID - 1].GetComponent<RectTransform>().DOScale(0.5f, 0.5f * animSpeedMultiplier));
             }
         }
 
@@ -171,7 +181,7 @@ public class AnimationManagerScript : MonoBehaviour
     }
 
     // Return all player plaques, player choice icons, and option cards to normal.
-    private async Task ResetPlayerAndChoice(List<PlayerScript> delvers, PlayerScript currentDelver = null)
+    private async Task ResetPlayerAndChoice()
     {
         List<Task> resetTasks = new List<Task>();
         Sequence resetSequence = DOTween.Sequence();
@@ -198,13 +208,13 @@ public class AnimationManagerScript : MonoBehaviour
     }
 
     // Highlight / unhighlight player plaque(s).
-    private async Task ChangePlayerInvolvement(List<PlayerScript> delvers, bool involve = true)
+    private async Task ChangePlayerInvolvement(List<PlayerScript> involvedDelvers, bool involve = true)
     {
         List<Task> involveTasks = new List<Task>();
         Sequence involveSequence = DOTween.Sequence();
 
         float fadeLevel = involve ? 1.0f : 0.5f;
-        foreach(PlayerScript delver in delvers)
+        foreach(PlayerScript delver in involvedDelvers)
         {
             involveSequence.Join(delver.GetComponent<CanvasGroup>().DOFade(fadeLevel, 0.5f * animSpeedMultiplier));
             involveSequence.Join(delver.playerPlaque.GetComponent<CanvasGroup>().DOFade(fadeLevel, 0.5f * animSpeedMultiplier));
@@ -215,13 +225,13 @@ public class AnimationManagerScript : MonoBehaviour
     }
 
     // Highlight / unhighlight player choice icon(s).
-    private async Task ChangeIconInvolvement(List<PlayerScript> delvers, bool involve = true)
+    private async Task ChangeIconInvolvement(List<PlayerScript> involvedDelvers, bool involve = true)
     {
         List<Task> involveTasks = new List<Task>();
         Sequence involveSequence = DOTween.Sequence();
 
         float fadeLevel = involve ? 1.0f : 0.5f;
-        foreach (PlayerScript delver in delvers)
+        foreach (PlayerScript delver in involvedDelvers)
         {
             int iconId = delver.delverID - 1;
             GameObject currentPlayerIcon = delverIcons[iconId];
@@ -234,13 +244,12 @@ public class AnimationManagerScript : MonoBehaviour
     }
 
     // Revert UI to normal when action resolution is completed.
-    private async Task CleanUpActionResolution(ManagerScript gameManager, List<PlayerScript> delvers)
+    private async Task CleanUpActionResolution()
     {
-        await ResetPlayerAndChoice(delvers);
+        await ResetPlayerAndChoice();
 
         List<Task> hideIconsTasks = new List<Task>();
         Sequence hideIconsSequence = DOTween.Sequence();
-        delverIcons = gameManager.delverIcons;
 
         foreach(GameObject delverIcon in delverIcons)
         {
