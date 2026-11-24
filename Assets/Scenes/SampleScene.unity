@@ -1150,6 +1150,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6d0e2b846786634cb5a6c19caf771a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 1540712660}
+  spiritPrefab: {fileID: 3555401369029318624, guid: 3bee25d42d8cf3a4a82be0d86958694f, type: 3}
   treasures0:
   - {fileID: 1877739404}
   - {fileID: 1031976712}
@@ -1194,7 +1196,6 @@ MonoBehaviour:
   - {fileID: 2073941055}
   - {fileID: 2049650078}
   - {fileID: 547914811}
-  GameCanvas: {fileID: 761839022}
   options:
   - {fileID: 2086075914}
   - {fileID: 369313763}
@@ -1207,8 +1208,9 @@ MonoBehaviour:
   coinHeads: {fileID: -241437977153705010, guid: f01c033855d614947a56cd5781bda531, type: 3}
   coinSide: {fileID: 8142147000025507495, guid: ddd4bc2baaee18946bbbf73482c5737c, type: 3}
   coinTails: {fileID: -6107159509478369303, guid: 26a885feaf3c2ee4486a7f33141fe33e, type: 3}
-  animSpeedMultiplier: 1
+  delvers: []
   delverIcons: []
+  animSpeedMultiplier: 1
 --- !u!4 &364044456
 Transform:
   m_ObjectHideFlags: 0

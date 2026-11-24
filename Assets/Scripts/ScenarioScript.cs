@@ -2,6 +2,7 @@ using DG.Tweening;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
@@ -31,7 +32,9 @@ public abstract class ScenarioScript : ScriptableObject
     public static event Func<PlayerScript, int, Task> OnTreasuresAdded;
     public static event Func<PlayerScript, int, Task> OnTreasuresRemoved;
     public static event Func<PlayerScript, List<PlayerScript>, int, Task> OnTreasuresStolen;
-    public static event Func<List<PlayerScript>, PlayerScript, Task> OnActionResolutionBegan;
+    public static event Func<Task> OnResetDelvers;
+    public static event Func<Task> OnSpiritBribingBegan;
+    public static event Func<PlayerScript, Task> OnActionResolutionBegan;
     public static event Func<List<PlayerScript>, bool, Task> OnChangePlayerInvolvement;
     public static event Func<List<PlayerScript>, bool, Task> OnChangeIconInvolvement;
     public static event Func<bool, Task> OnConditionResult;
@@ -62,8 +65,10 @@ public abstract class ScenarioScript : ScriptableObject
     // resolve scenario
     public async Task ScenarioResolution(List<PlayerScript> delvers, PlayerScript currentFirstDelver, List<GameStateScript> currentHistory)
     {
+        await ResetDelvers();
         Debug.Log("Resolving spirit calls");
-        await SpiritCallingResolutions(delvers);
+        await SpiritBribing();
+        await SpiritBribingResolutions(delvers);
         Debug.Log("Resolving actions for " + name);
         // reset the main tracker vars
         currentDelver = currentFirstDelver;
@@ -106,7 +111,7 @@ public abstract class ScenarioScript : ScriptableObject
         {
             // recalculate delver order by score between each action resolution
             List<PlayerScript> delversSortedScores = delvers.OrderByDescending(obj => obj.treasures).ToList();
-            await ActionResolutionBegan(delversSortedScores, currentDelver);
+            await ActionResolutionBegan(currentDelver);
             await ActionResolutions(delversSortedScores);
 
             // move to next delver in turn order
@@ -115,7 +120,7 @@ public abstract class ScenarioScript : ScriptableObject
     }
 
     // resolve delvers' spirit calling choices
-    async Task SpiritCallingResolutions(List<PlayerScript> delvers)
+    async Task SpiritBribingResolutions(List<PlayerScript> delvers)
     {
         // handle edge case of empty list of delvers being passed
         if(delvers.Count == 0)
@@ -233,7 +238,7 @@ public abstract class ScenarioScript : ScriptableObject
     }
 
     // resolve players' action choices (implement in child scripts)
-    protected virtual async Task ActionResolutions(List<PlayerScript> delverSortedScores)
+    protected virtual async Task ActionResolutions(List<PlayerScript> delvers)
     {
         await Task.CompletedTask;
     }
@@ -243,6 +248,18 @@ public abstract class ScenarioScript : ScriptableObject
     {
         actionTitles = new string[actionCount];
         actionEffects = new string[actionCount];
+    }
+
+    // Trigger the event for resetting delver symbology
+    protected async Task ResetDelvers()
+    {
+        await OnResetDelvers?.Invoke();
+    }
+
+    // Trigger the event for highlighting delvers that are bribing the spirit
+    protected async Task SpiritBribing()
+    {
+        await OnSpiritBribingBegan?.Invoke();
     }
 
     // Version of treasureAdjustments that takes in a single delver for convenience.
@@ -291,23 +308,23 @@ public abstract class ScenarioScript : ScriptableObject
         thievingDelver.treasures += treasureDelta * affectedDelvers.Count;
     }
 
-    // Trigger the event for the beginning of a player's action resolution.
-    protected async Task ActionResolutionBegan(List<PlayerScript> delvers, PlayerScript currentDelver)
+    // Trigger the event for the beginning of a delver's action resolution.
+    protected async Task ActionResolutionBegan(PlayerScript currentDelver)
     {
         // Thread-safe invocation using the null-conditional operator
-        await OnActionResolutionBegan?.Invoke(delvers, currentDelver);
+        await OnActionResolutionBegan?.Invoke(currentDelver);
     }
 
-    // Trigger the event for player(s) being involved / uninvolved in a resolution effect.
-    protected async Task ChangePlayerInvolvement(List<PlayerScript> delvers, bool involve = true)
+    // Trigger the event for delver(s) being involved / uninvolved in a resolution effect.
+    protected async Task ChangePlayerInvolvement(List<PlayerScript> involvedDelvers, bool involve = true)
     {
-        await OnChangePlayerInvolvement?.Invoke(delvers, involve);
+        await OnChangePlayerInvolvement?.Invoke(involvedDelvers, involve);
     }
 
     // Trigger the event for player choice icon(s) being involved / uninvolved in a resolution effect.
-    protected async Task ChangeIconInvolvement(List<PlayerScript> delvers, bool involve = true)
+    protected async Task ChangeIconInvolvement(List<PlayerScript> involvedDelvers, bool involve = true)
     {
-        await OnChangeIconInvolvement?.Invoke(delvers, involve);
+        await OnChangeIconInvolvement?.Invoke(involvedDelvers, involve);
     }
 
     // Trigger the event for a conditional effect succeeding or failing.
